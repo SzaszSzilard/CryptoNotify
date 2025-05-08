@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  keydb:
+    image: eqalpha/keydb
+    container_name: keydb
+    ports:
+      - "6379:6379"
+    command: >
+      keydb-server /etc/keydb/keydb.conf
+      --appendonly yes
+      --appendfsync always
+      --dir /data
+      --dbfilename dump.rdb
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
