@@ -17,6 +17,6 @@ public class ShortTermRally extends NotificationModel {
         Double oldestPrice = 0.0;
         Double currentPrice = 0.0;
 
-        return Math.abs(currentPrice - (oldestPrice * (1 + percentageChange))) >= percentageChange;
+        return abs((currentPrice - oldestPrice) / currentPrice) > percentageChange;
     }
 }
