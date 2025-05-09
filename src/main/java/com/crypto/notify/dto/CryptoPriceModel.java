@@ -1,3 +1,3 @@
 package com.crypto.notify.dto;
 
-public record CryptoPriceModel(String symbol, String price) {}
+public record CryptoPriceModel(String symbol, Double price) {}

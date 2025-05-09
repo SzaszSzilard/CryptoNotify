@@ -1,7 +1,5 @@
 package com.crypto.notify.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -30,9 +28,5 @@ public class KeyDbService {
 
     public Flux<String> getFullList(String key) {
         return reactiveRedisTemplate.opsForList().range(key, 0, -1);
-    }
-
-    public Mono<Object> saveUserNotification(String userId, String notificationType, String notificationValues) {
-        return Mono.empty();
     }
 }

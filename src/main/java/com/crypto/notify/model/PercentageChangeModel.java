@@ -1,10 +1,9 @@
 package com.crypto.notify.model;
 
-public class PercentageChangeModel extends AboveBelowNotificationModel {
+public class PercentageChangeModel {
     private Double percentageChange;
 
     public PercentageChangeModel(String userId, String symbol, Double targetPrice, Double percentageChange) {
-        super(userId, symbol, targetPrice);
         this.percentageChange = percentageChange;
     }
 

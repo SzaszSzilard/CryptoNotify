@@ -1,7 +1,9 @@
 package com.crypto.notify.controller;
 
+import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.service.KeyDbService;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.*;
@@ -16,14 +18,19 @@ public class DebugController {
         this.keyDbService = keyDbService;
     }
 
-    @GetMapping("/keydb")
-    public Mono<String> getKeyValue(@RequestParam String key) {
+    @GetMapping("/key")
+    public Mono<String> key(@RequestParam String key) {
         return keyDbService.getValue(key);
     }
 
-    @PostMapping("/keydb")
-    public Mono<Boolean> saveKeyValue(@RequestParam String key, @RequestParam String value) {
+    @PostMapping("/key")
+    public Mono<Boolean> key(@RequestParam String key, @RequestParam String value) {
         return keyDbService.saveValue(key, value);
+    }
+
+    @GetMapping("/key-list")
+    public Flux<String> keyList(@RequestParam String key) {
+        return keyDbService.getFullList(key);
     }
 
     @GetMapping("/threads")

@@ -8,4 +8,12 @@ public class NotificationModel{
         this.userId = userId;
         this.symbol = symbol;
     }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
 }
