@@ -10,12 +10,12 @@ import reactor.core.publisher.Mono;
 public class KeyDbService {
     private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
 
-    public Long autoID(String key) {
-        return redisTemplate.opsForValue().increment(key);
-    }
-
     public KeyDbService(ReactiveRedisTemplate<String, String> reactiveRedisTemplate) {
         this.reactiveRedisTemplate = reactiveRedisTemplate;
+    }
+
+    public Mono<Long> autoID(String key) {
+        return reactiveRedisTemplate.opsForValue().increment(key);
     }
 
     public Mono<String> getValue(String key) {

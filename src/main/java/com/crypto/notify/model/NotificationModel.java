@@ -12,7 +12,7 @@ public class NotificationModel{
     public NotificationModel(String userId, String symbol, KeyDbService keyDbService) {
         this.keyDbService = keyDbService;
 
-        this.id = keyDbService.autoID("unseparatedNotityIds");
+        this.id = keyDbService.autoID("unseparatedNotityIds").block();
         this.userId = userId;
         this.symbol = symbol;
     }
