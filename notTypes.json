@@ -33,13 +33,14 @@
     "id": 777,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
-    "percentage": 10.0
+    "percentage": 10.0,
+    "time": "5,10,30,60,3600"
   },
 
   "changeOfDirection": {
     "id": 999,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
-    "timeframeMinutes": "5,10,30,60,3600"
+    "time": "5,10,30,60,3600"
   }
 }

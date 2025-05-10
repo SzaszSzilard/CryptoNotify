@@ -1,21 +1,17 @@
 package com.crypto.notify.model;
 
-import com.crypto.notify.service.KeyDbService;
-
-public class NotificationModel{
-    private final KeyDbService keyDbService;
-
-    private final Long id;
+public abstract class NotificationModel{
+    private Long id;
     private final String userId;
     private final String symbol;
 
-    public NotificationModel(String userId, String symbol, KeyDbService keyDbService) {
-        this.keyDbService = keyDbService;
-
-        this.id = keyDbService.autoID("unseparatedNotityIds").block();
+    public NotificationModel(Long id, String userId, String symbol) {
+        this.id = id;
         this.userId = userId;
         this.symbol = symbol;
     }
+
+    public abstract void setAutoId(String notificationType);
 
     public String getUserId() {
         return userId;
@@ -23,5 +19,9 @@ public class NotificationModel{
 
     public String getSymbol() {
         return symbol;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

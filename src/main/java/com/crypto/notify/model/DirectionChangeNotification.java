@@ -2,9 +2,9 @@ package com.crypto.notify.model;
 
 import static java.lang.Math.abs;
 
-public class DirectionChangeNotification extends NotificationModel {
+public abstract class DirectionChangeNotification extends NotificationModel {
     public DirectionChangeNotification(String userId, String symbol, String time, Double percentageChange) {
-        super(userId, symbol);
+        super(1L, userId, symbol);
     }
 
     public boolean directionChanged(String time, Double percentageChange) {
