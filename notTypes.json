@@ -1,0 +1,45 @@
+{
+  "above": {
+    "id": 13,
+    "userId": "AQA",
+    "symbol": "BTCUSDT",
+    "price": 102000.0
+  },
+
+  "below": {
+    "id": 13,
+    "userId": "XAFA",
+    "symbol": "BTCUSDT",
+    "price": 102000.0
+  },
+
+  "percentageUp": {
+    "id": 666,
+    "userId": "XAFA",
+    "symbol": "BTCUSDT",
+    "price": 102000.0,
+    "percentage": 10.0
+  },
+
+  "percentageDown": {
+    "id": 666,
+    "userId": "XAFA",
+    "symbol": "BTCUSDT",
+    "price": 102000.0,
+    "percentage": 10.0
+  },
+
+  "rally": {
+    "id": 777,
+    "userId": "XAFA",
+    "symbol": "BTCUSDT",
+    "percentage": 10.0
+  },
+
+  "changeOfDirection": {
+    "id": 999,
+    "userId": "XAFA",
+    "symbol": "BTCUSDT",
+    "timeframeMinutes": "5,10,30,60,3600"
+  }
+}
