@@ -18,13 +18,13 @@ public class DebugController {
         this.keyDbService = keyDbService;
     }
 
-    @GetMapping("/key")
-    public Mono<String> key(@RequestParam String key) {
+    @GetMapping("/key/{key}")
+    public Mono<String> key(@PathVariable String key) {
         return keyDbService.getValue(key);
     }
 
-    @PostMapping("/key")
-    public Mono<Boolean> key(@RequestParam String key, @RequestParam String value) {
+    @PostMapping("/key/{key}/{value}")
+    public Mono<Boolean> key(@PathVariable String key, @PathVariable String value) {
         return keyDbService.saveValue(key, value);
     }
 
