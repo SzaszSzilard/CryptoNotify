@@ -24,12 +24,12 @@ public class DebugController {
     }
 
     @PostMapping("/key/{key}/{value}")
-    public Mono<Boolean> key(@PathVariable String key, @PathVariable String value) {
+    public Mono<Boolean> key(@PathVariable String key, @PathVariable  String value) {
         return keyDbService.saveValue(key, value);
     }
 
-    @GetMapping("/key-list")
-    public Flux<String> keyList(@RequestParam String key) {
+    @GetMapping("/key-list/{key}")
+    public Flux<String> keyList(@PathVariable String key) {
         return keyDbService.getFullList(key);
     }
 

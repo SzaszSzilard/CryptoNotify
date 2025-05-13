@@ -14,7 +14,7 @@ public class KeyDbService {
         this.reactiveRedisTemplate = reactiveRedisTemplate;
     }
 
-    public Mono<Long> getAutoID(String key) {
+    public Mono<Long> getIncId(String key) {
         return reactiveRedisTemplate.opsForValue().increment(key);
     }
 

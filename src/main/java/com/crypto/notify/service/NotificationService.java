@@ -1,6 +1,6 @@
 package com.crypto.notify.service;
 
-import com.crypto.notify.model.AboveNotificationModel;
+import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -26,7 +26,10 @@ public class NotificationService {
 //                        .price() > aboveNotification.getTargetPrice());
 //    }
 
-    public Mono<Long> saveNotification(AboveNotificationModel notification) {
-        return keyDbService.pushIntoList("notification", cryptoDTOMapper.toJson(notification));
+    public Mono<Long> saveNotification(String type, NotificationModel notification) {
+        return keyDbService.getIncId(type).flatMap(id -> {
+            notification.setId(id);
+            return keyDbService.pushIntoList(type, cryptoDTOMapper.toJson(notification));
+        });
     }
 }

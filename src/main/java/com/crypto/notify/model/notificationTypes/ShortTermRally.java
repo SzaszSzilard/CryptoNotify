@@ -1,7 +1,9 @@
-package com.crypto.notify.model;
+package com.crypto.notify.model.notificationTypes;
 
+import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.service.KeyDbService;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 
 import static java.lang.Math.abs;
 
@@ -14,7 +16,7 @@ public class ShortTermRally extends NotificationModel {
 
 
     public ShortTermRally(String userId, String symbol, String time, Double percentageChange) {
-        super(1L, userId, symbol);
+        super(userId, symbol);
         this.time = time;
         this.percentageChange = percentageChange;
     }
@@ -28,7 +30,7 @@ public class ShortTermRally extends NotificationModel {
     }
 
     @Override
-    public void setAutoId(String notificationType) {
-        this.setId(keyDbService.getAutoID("n_rally").block());
+    public Mono<Long> save() {
+        return this.notificationService.saveNotification("n_rally", this);
     }
 }
