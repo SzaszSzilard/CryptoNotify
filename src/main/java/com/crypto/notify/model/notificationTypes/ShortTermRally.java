@@ -15,11 +15,13 @@ public class ShortTermRally extends NotificationModel {
         this.type = "n_rally";
     }
 
-    public boolean isRallying(String time, Double percentageChange) {
+    public boolean shouldNotify() {
         // get timeframe from redis form and compare percentage
-        Double oldPrice = 0.0;
-        Double currentPrice = 0.0;
+//        Double oldPrice = 0.0;
+//        Double currentPrice = 0.0;
+//
+//        return abs((currentPrice - oldPrice) / currentPrice) > percentageChange;
 
-        return abs((currentPrice - oldPrice) / currentPrice) > percentageChange;
+        return false;
     }
 }

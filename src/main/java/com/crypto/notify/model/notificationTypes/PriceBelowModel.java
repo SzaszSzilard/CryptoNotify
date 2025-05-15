@@ -8,7 +8,8 @@ public class PriceBelowModel extends PriceTargetNotificationModel {
         this.type = "n_below";
     }
 
-    public boolean isBelowTargetPrice(Double currentPrice) {
-        return currentPrice < this.price;
+    public boolean shouldNotify() {
+//        return currentPrice < this.price;
+        return false;
     }
 }

@@ -11,7 +11,7 @@ public class DirectionChangeNotification extends NotificationModel {
         this.type = "n_change";
     }
 
-    public boolean directionChanged(String time, Double percentageChange) {
+    public boolean shouldNotify() {
 //        previousWindow = [102, 101, 100]
 //        currentWindow = [101, 103, 105]
 //        prevTrend = getTrend(previous_window)

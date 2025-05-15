@@ -7,4 +7,9 @@ public class PercentageBelowModel extends PercentageChangeModel {
         super(userId, symbol, price, percentageChange);
         this.type = "n_percent_below";
     }
+
+    public boolean shouldNotify() {
+//        return currentPrice < this.price * (1 - this.percentageChange / 100);
+        return false;
+    }
 }

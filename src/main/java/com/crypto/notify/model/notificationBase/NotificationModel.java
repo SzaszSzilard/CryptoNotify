@@ -44,6 +44,8 @@ public abstract class NotificationModel {
         return symbol;
     }
 
+    public abstract boolean shouldNotify();
+
     public String getType() {
         return type;
     }
