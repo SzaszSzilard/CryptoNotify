@@ -1,7 +1,5 @@
 package com.crypto.notify.model.notificationBase;
 
-import reactor.core.publisher.Mono;
-
 public abstract class PercentageChangeModel extends PriceTargetNotificationModel {
     protected Double percentageChange;
 
@@ -17,6 +15,4 @@ public abstract class PercentageChangeModel extends PriceTargetNotificationModel
     public void setPercentageChange(Double percentageChange) {
         this.percentageChange = percentageChange;
     }
-
-    public abstract Mono<Long> save();
 }

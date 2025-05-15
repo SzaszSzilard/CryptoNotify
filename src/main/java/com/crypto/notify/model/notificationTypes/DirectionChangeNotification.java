@@ -1,13 +1,14 @@
 package com.crypto.notify.model.notificationTypes;
 
 import com.crypto.notify.model.notificationBase.NotificationModel;
-import reactor.core.publisher.Mono;
-
-import static java.lang.Math.abs;
 
 public class DirectionChangeNotification extends NotificationModel {
+    private final String time;
+
     public DirectionChangeNotification(String userId, String symbol, String time) {
         super(userId, symbol);
+        this.time = time;
+        this.type = "n_change";
     }
 
     public boolean directionChanged(String time, Double percentageChange) {
@@ -18,10 +19,5 @@ public class DirectionChangeNotification extends NotificationModel {
 
 //        return prev_trend != curr_trend && curr_trend != "flat";
         return false;
-    }
-
-    @Override
-    public Mono<Long> save() {
-        return this.notificationService.saveNotification("n_change", this);
     }
 }

@@ -26,10 +26,10 @@ public class NotificationService {
 //                        .price() > aboveNotification.getTargetPrice());
 //    }
 
-    public Mono<Long> saveNotification(String type, NotificationModel notification) {
-        return keyDbService.getIncId(type).flatMap(id -> {
+    public Mono<Long> save(NotificationModel notification) {
+        return keyDbService.getIncId(notification.getType()).flatMap(id -> {
             notification.setId(id);
-            return keyDbService.pushIntoList(type, cryptoDTOMapper.toJson(notification));
+            return keyDbService.pushIntoList(notification.getType(), cryptoDTOMapper.toJson(notification));
         });
     }
 }
