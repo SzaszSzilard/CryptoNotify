@@ -1,6 +1,7 @@
 package com.crypto.notify.model.notificationTypes;
 
 import com.crypto.notify.model.notificationBase.NotificationModel;
+import reactor.core.publisher.Mono;
 
 import static java.lang.Math.abs;
 
@@ -15,13 +16,13 @@ public class ShortTermRally extends NotificationModel {
         this.type = "n_rally";
     }
 
-    public boolean shouldNotify() {
+    public Mono<Boolean> shouldNotify() {
         // get timeframe from redis form and compare percentage
 //        Double oldPrice = 0.0;
 //        Double currentPrice = 0.0;
 //
 //        return abs((currentPrice - oldPrice) / currentPrice) > percentageChange;
 
-        return false;
+        return Mono.just(false);
     }
 }

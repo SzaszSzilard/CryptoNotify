@@ -12,7 +12,7 @@ public abstract class PriceTargetNotificationModel extends NotificationModel {
         this.price = targetPrice;
     }
 
-    public Double getTargetPrice() {
+    public Double getPrice() {
         return price;
     }
 }

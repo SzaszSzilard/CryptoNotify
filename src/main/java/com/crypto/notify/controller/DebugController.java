@@ -33,6 +33,11 @@ public class DebugController {
         return keyDbService.getFullList(key);
     }
 
+    @DeleteMapping("/key/{key}")
+    public Mono<Boolean> deleteKey(@PathVariable String key) {
+        return keyDbService.deleteKey(key);
+    }
+
     @GetMapping("/threads")
     public List<Map<String, String>> listAllThreads() {
         List<Map<String, String>> threads = new ArrayList<>();

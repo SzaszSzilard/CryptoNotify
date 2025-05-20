@@ -1,8 +1,10 @@
 package com.crypto.notify.model.notificationBase;
 
 import com.crypto.notify.model.notificationTypes.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import reactor.core.publisher.Mono;
 
 
 @JsonTypeInfo(
@@ -11,13 +13,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type" // JSON must include this field
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PriceAboveModel.class, name = "priceAbove"),
-        @JsonSubTypes.Type(value = PriceBelowModel.class, name = "priceBelow"),
-        @JsonSubTypes.Type(value = PercentageAboveModel.class, name = "percentageAbove"),
-        @JsonSubTypes.Type(value = PercentageBelowModel.class, name = "percentageBelow"),
-        @JsonSubTypes.Type(value = ShortTermRally.class, name = "shortTermRally")
+        @JsonSubTypes.Type(value = PriceAboveModel.class, name = "n_above"),
+        @JsonSubTypes.Type(value = PriceBelowModel.class, name = "n_below"),
+        @JsonSubTypes.Type(value = PercentageAboveModel.class, name = "n_percent_above"),
+        @JsonSubTypes.Type(value = PercentageBelowModel.class, name = "n_percent_below"),
+        @JsonSubTypes.Type(value = ShortTermRally.class, name = "n_rally")
 })
 public abstract class NotificationModel {
+    @JsonIgnore
     protected String type = "n_generic";
     protected Long id;
     protected final String userId;
@@ -44,7 +47,7 @@ public abstract class NotificationModel {
         return symbol;
     }
 
-    public abstract boolean shouldNotify();
+    public abstract Mono<Boolean> shouldNotify();
 
     public String getType() {
         return type;

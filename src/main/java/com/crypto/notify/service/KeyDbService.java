@@ -26,6 +26,10 @@ public class KeyDbService {
         return reactiveRedisTemplate.opsForValue().set(key, value);
     }
 
+    public Mono<Boolean> deleteKey(String key) {
+        return reactiveRedisTemplate.opsForValue().delete(key);
+    }
+
     public Mono<Long> pushIntoList(String key, String value) {
         return reactiveRedisTemplate.opsForList().leftPush(key, value);
     }
