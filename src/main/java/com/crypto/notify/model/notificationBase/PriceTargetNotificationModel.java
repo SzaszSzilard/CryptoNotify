@@ -15,4 +15,6 @@ public abstract class PriceTargetNotificationModel extends NotificationModel {
     public Double getPrice() {
         return price;
     }
+
+    public abstract boolean shouldNotify(Double price);
 }

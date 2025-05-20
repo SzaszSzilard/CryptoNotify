@@ -4,7 +4,6 @@ import com.crypto.notify.model.notificationTypes.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import reactor.core.publisher.Mono;
 
 
 @JsonTypeInfo(
@@ -46,8 +45,6 @@ public abstract class NotificationModel {
     public String getSymbol() {
         return symbol;
     }
-
-    public abstract Mono<Boolean> shouldNotify();
 
     public String getType() {
         return type;

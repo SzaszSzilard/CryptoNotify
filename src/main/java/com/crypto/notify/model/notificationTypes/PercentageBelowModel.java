@@ -1,7 +1,6 @@
 package com.crypto.notify.model.notificationTypes;
 
 import com.crypto.notify.model.notificationBase.PercentageChangeModel;
-import reactor.core.publisher.Mono;
 
 public class PercentageBelowModel extends PercentageChangeModel {
     public PercentageBelowModel(String userId, String symbol, Double price, Double percentageChange) {
@@ -9,7 +8,7 @@ public class PercentageBelowModel extends PercentageChangeModel {
         this.type = "n_percent_below";
     }
 
-    public Mono<Boolean> shouldNotify() {
-//        return currentPrice < this.price * (1 - this.percentageChange / 100);
-        return Mono.just(false);    }
+    public boolean shouldNotify(Double currentPrice) {
+        return currentPrice < this.price * (1 - this.percentageChange / 100);
+    }
 }
