@@ -2,11 +2,11 @@ package com.crypto.notify.util;
 
 import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.model.notificationTypes.PriceAboveModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -39,5 +39,9 @@ public class CryptoDTOMapper extends ObjectMapper {
         } catch (JsonProcessingException e) {
             throw new RuntimeException("JSON mapping failed", e);
         }
+    }
+
+    public PriceAboveModel toPriceAbove(String json) {
+        return importGeneric(json, new TypeReference<>() {});
     }
 }

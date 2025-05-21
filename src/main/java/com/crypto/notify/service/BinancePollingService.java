@@ -20,14 +20,17 @@ public class BinancePollingService {
     private final KeyDbService keyDbService;
     private final CryptoDTOMapper cryptoDTOMapper;
     private final Logger log = LoggerFactory.getLogger(BinancePollingService.class);
+    private final NotificationService notificationService;
 
 
     public BinancePollingService(WebClient.Builder webClientBuilder,
                                  KeyDbService keyDbService,
-                                 CryptoDTOMapper cryptoDTOMapper) {
+                                 CryptoDTOMapper cryptoDTOMapper,
+                                 NotificationService notificationService) {
         this.webClient = webClientBuilder.baseUrl("https://api.binance.com").build();
         this.keyDbService = keyDbService;
         this.cryptoDTOMapper = cryptoDTOMapper;
+        this.notificationService = notificationService;
     }
 
     @Scheduled(fixedRate = 1000)
@@ -70,5 +73,12 @@ public class BinancePollingService {
                     return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoPriceHistoryModell));
                 })
                 .subscribe(saved -> log.info("Binance data saved for history"));
+    }
+
+    @Scheduled(fixedRate = 1000*60)
+    public void PriceAboveNotificationSender() {
+        keyDbService.getFullList("n_above")
+                .map(cryptoDTOMapper::toPriceAbove)
+                .flatMap(notificationService::priceTargetReached);
     }
 }
