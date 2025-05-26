@@ -1,8 +1,11 @@
 package com.crypto.notify.service;
 
+import com.crypto.notify.controller.CryptoController;
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import com.crypto.notify.util.CryptoDTOMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -10,6 +13,7 @@ import reactor.core.publisher.Mono;
 public class NotificationService {
     private final KeyDbService keyDbService;
     private final CryptoDTOMapper cryptoDTOMapper;
+    private final Logger log = LoggerFactory.getLogger(NotificationService.class);
 
     public NotificationService(KeyDbService keyDbService,
                                CryptoDTOMapper cryptoDTOMapper) {
@@ -28,6 +32,13 @@ public class NotificationService {
     }
 
     public Mono<Long> save(NotificationModel notification) {
+        return keyDbService.getIncId(notification.getType()+"_idc").flatMap(id -> {
+            notification.setId(id);
+            return keyDbService.pushIntoList(notification.getType(), cryptoDTOMapper.toJson(notification));
+        });
+    }
+
+    public Mono<Long> delete(NotificationModel notification) {
         return keyDbService.getIncId(notification.getType()+"_idc").flatMap(id -> {
             notification.setId(id);
             return keyDbService.pushIntoList(notification.getType(), cryptoDTOMapper.toJson(notification));

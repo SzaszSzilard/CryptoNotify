@@ -1,7 +1,9 @@
-package com.crypto.notify.service;
+package com.crypto.notify.scheduler;
 
 import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.service.KeyDbService;
+import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,19 +16,19 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
-public class BinancePollingService {
+public class BinancePollingScheduler {
 
     private final WebClient webClient;
     private final KeyDbService keyDbService;
     private final CryptoDTOMapper cryptoDTOMapper;
-    private final Logger log = LoggerFactory.getLogger(BinancePollingService.class);
+    private final Logger log = LoggerFactory.getLogger(BinancePollingScheduler.class);
     private final NotificationService notificationService;
 
 
-    public BinancePollingService(WebClient.Builder webClientBuilder,
-                                 KeyDbService keyDbService,
-                                 CryptoDTOMapper cryptoDTOMapper,
-                                 NotificationService notificationService) {
+    public BinancePollingScheduler(WebClient.Builder webClientBuilder,
+                                   KeyDbService keyDbService,
+                                   CryptoDTOMapper cryptoDTOMapper,
+                                   NotificationService notificationService) {
         this.webClient = webClientBuilder.baseUrl("https://api.binance.com").build();
         this.keyDbService = keyDbService;
         this.cryptoDTOMapper = cryptoDTOMapper;
@@ -73,12 +75,5 @@ public class BinancePollingService {
                     return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoPriceHistoryModell));
                 })
                 .subscribe(saved -> log.info("Binance data saved for history"));
-    }
-
-    @Scheduled(fixedRate = 1000*60)
-    public void PriceAboveNotificationSender() {
-        keyDbService.getFullList("n_above")
-                .map(cryptoDTOMapper::toPriceAbove)
-                .flatMap(notificationService::priceTargetReached);
     }
 }

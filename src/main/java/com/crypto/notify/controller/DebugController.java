@@ -38,6 +38,11 @@ public class DebugController {
         return keyDbService.deleteKey(key);
     }
 
+    @GetMapping("/keys/")
+    public Mono<List<String>> keys() {
+        return keyDbService.getAllKeys().collectList();
+    }
+
     @GetMapping("/threads")
     public List<Map<String, String>> listAllThreads() {
         List<Map<String, String>> threads = new ArrayList<>();

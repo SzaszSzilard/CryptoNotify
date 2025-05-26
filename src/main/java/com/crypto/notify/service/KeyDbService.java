@@ -37,4 +37,8 @@ public class KeyDbService {
     public Flux<String> getFullList(String key) {
         return reactiveRedisTemplate.opsForList().range(key, 0, -1);
     }
+
+    public Flux<String> getAllKeys() {
+        return reactiveRedisTemplate.keys("*");
+    }
 }
