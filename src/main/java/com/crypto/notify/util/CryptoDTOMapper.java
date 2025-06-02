@@ -2,7 +2,10 @@ package com.crypto.notify.util;
 
 import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.model.notificationTypes.PercentageAboveModel;
+import com.crypto.notify.model.notificationTypes.PercentageBelowModel;
 import com.crypto.notify.model.notificationTypes.PriceAboveModel;
+import com.crypto.notify.model.notificationTypes.PriceBelowModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +45,18 @@ public class CryptoDTOMapper extends ObjectMapper {
     }
 
     public PriceAboveModel toPriceAbove(String json) {
+        return importGeneric(json, new TypeReference<>() {});
+    }
+
+    public PriceBelowModel toPriceBelow(String json) {
+        return importGeneric(json, new TypeReference<>() {});
+    }
+
+    public PercentageAboveModel toPercentageAbove(String json) {
+        return importGeneric(json, new TypeReference<>() {});
+    }
+
+    public PercentageBelowModel toPercentageBelow(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 }

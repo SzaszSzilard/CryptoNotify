@@ -1,6 +1,5 @@
 package com.crypto.notify.service;
 
-import com.crypto.notify.controller.CryptoController;
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import com.crypto.notify.util.CryptoDTOMapper;
@@ -39,9 +38,7 @@ public class NotificationService {
     }
 
     public Mono<Long> delete(NotificationModel notification) {
-        return keyDbService.getIncId(notification.getType()+"_idc").flatMap(id -> {
-            notification.setId(id);
-            return keyDbService.pushIntoList(notification.getType(), cryptoDTOMapper.toJson(notification));
-        });
+        String json = cryptoDTOMapper.toJson(notification);
+        return keyDbService.removeFromList(notification.getType(), json);
     }
 }

@@ -8,10 +8,6 @@ public abstract class PriceTargetNotificationModel extends NotificationModel {
         this.price = price;
     }
 
-    public void setTargetPrice(Double targetPrice) {
-        this.price = targetPrice;
-    }
-
     public Double getPrice() {
         return price;
     }

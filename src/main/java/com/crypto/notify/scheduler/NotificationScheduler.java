@@ -1,7 +1,5 @@
 package com.crypto.notify.scheduler;
 
-import com.crypto.notify.dto.CryptoPriceHistoryModel;
-import com.crypto.notify.dto.CryptoPriceModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.util.CryptoDTOMapper;
@@ -9,11 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
+import reactor.core.publisher.Flux;
 
 @Service
 public class NotificationScheduler {
@@ -34,13 +28,19 @@ public class NotificationScheduler {
 
     @Scheduled(fixedRate = 1000*60)
     public void PriceTargetNotificationSender() {
-        keyDbService.getFullList("n_above")
-                .map(cryptoDTOMapper::toPriceAbove)
+        Flux.concat(
+                keyDbService.getFullList("n_above").map(cryptoDTOMapper::toPriceAbove),
+                keyDbService.getFullList("n_below").map(cryptoDTOMapper::toPriceBelow),
+                keyDbService.getFullList("n_percent_above").map(cryptoDTOMapper::toPercentageAbove),
+                keyDbService.getFullList("n_percent_below").map(cryptoDTOMapper::toPercentageBelow)
+        )
                 .flatMap(notification -> notificationService.priceTargetReached(notification)
                         .filter(Boolean::booleanValue)
-                        .doOnNext(shouldNotify -> {
-                            log.info("Price target reached for notification: {}", notification);
-                            notificationService.delete(notification);
+                        .flatMap(_ -> {
+                            log.info("Price target reached for notification, type: {}, id: {}", notification.getType(), notification.getId());
+                            // Implement push notification
+                            return notificationService.delete(notification)
+                                    .doOnSuccess(s -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
                         })
                 )
                 .subscribe();

@@ -1,5 +1,6 @@
 {
   "above": {
+    "type":"n_above",
     "id": 13,
     "userId": "AQA",
     "symbol": "BTCUSDT",
@@ -7,6 +8,7 @@
   },
 
   "below": {
+    "type":"n_below",
     "id": 13,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
@@ -14,6 +16,7 @@
   },
 
   "percentageUp": {
+    "type":"n_percent_above",
     "id": 666,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
@@ -22,6 +25,7 @@
   },
 
   "percentageDown": {
+    "type":"n_percent_below",
     "id": 666,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
@@ -30,6 +34,7 @@
   },
 
   "rally": {
+    "type":"n_change",
     "id": 777,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
@@ -38,6 +43,7 @@
   },
 
   "changeOfDirection": {
+    "type":"n_rally",
     "id": 999,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
