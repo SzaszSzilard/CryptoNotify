@@ -5,7 +5,7 @@ import com.crypto.notify.model.notificationBase.PercentageChangeModel;
 public class PercentageAboveModel extends PercentageChangeModel {
     public PercentageAboveModel(String userId, String symbol, Double price, Double percentage) {
         super(userId, symbol, price, percentage);
-        this.type = "n_percent_above";
+        this.type = "n-percent-above";
     }
 
     public boolean shouldNotify(Double currentPrice) {

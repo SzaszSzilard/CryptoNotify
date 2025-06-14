@@ -2,6 +2,7 @@ package com.crypto.notify.service;
 
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
+import com.crypto.notify.constants.Constants;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +14,7 @@ public class NotificationService {
     private final KeyDbService keyDbService;
     private final CryptoDTOMapper cryptoDTOMapper;
     private final Logger log = LoggerFactory.getLogger(NotificationService.class);
+    private final String ID_COUNTER = "idc:";
 
     public NotificationService(KeyDbService keyDbService,
                                CryptoDTOMapper cryptoDTOMapper) {
@@ -21,7 +23,7 @@ public class NotificationService {
     }
 
     public Mono<Boolean> priceTargetReached(PriceTargetNotificationModel notification) {
-        return keyDbService.getValue("crypto_prices")
+        return keyDbService.getValue(Constants.CRYPTO_PRICES)
                 .map(cryptoDTOMapper::toCryptoPrice)
                 .map(cryptoList -> cryptoList.stream()
                         .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
@@ -31,14 +33,16 @@ public class NotificationService {
     }
 
     public Mono<Long> save(NotificationModel notification) {
-        return keyDbService.getIncId(notification.getType()+"_idc").flatMap(id -> {
+        String key = notification.getType() + ":" + notification.getUserId();
+        return keyDbService.getIncId(ID_COUNTER + key).flatMap(id -> {
             notification.setId(id);
-            return keyDbService.pushIntoList(notification.getType(), cryptoDTOMapper.toJson(notification));
+            return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(notification));
         });
     }
 
     public Mono<Long> delete(NotificationModel notification) {
+        String key = notification.getType() + ":" + notification.getUserId();
         String json = cryptoDTOMapper.toJson(notification);
-        return keyDbService.removeFromList(notification.getType(), json);
+        return keyDbService.removeFromList(key, json);
     }
 }

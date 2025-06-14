@@ -4,6 +4,7 @@ import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.dto.CryptoPriceModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
+import com.crypto.notify.constants.Constants;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +44,10 @@ public class BinancePollingScheduler {
                 .bodyToMono(String.class)
                 .flatMap(response -> {
                         List<CryptoPriceModel> prices = cryptoDTOMapper.toCryptoPrice(response).stream()
-                                .filter(price -> price.symbol().contains("USDT"))
+                                .filter(price -> price.symbol().endsWith("USDT"))
                                 .toList();
 
-                        return keyDbService.saveValue("crypto_prices", cryptoDTOMapper.toJson(prices));
+                        return keyDbService.saveValue(Constants.CRYPTO_PRICES, cryptoDTOMapper.toJson(prices));
                 })
                 .subscribe(saved -> {
                     if (!saved) {

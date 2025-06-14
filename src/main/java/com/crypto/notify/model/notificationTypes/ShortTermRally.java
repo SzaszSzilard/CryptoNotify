@@ -13,7 +13,7 @@ public class ShortTermRally extends NotificationModel {
         super(userId, symbol);
         this.time = time;
         this.percentageChange = percentageChange;
-        this.type = "n_rally";
+        this.type = "n-rally";
     }
 
     public Mono<Boolean> shouldNotify() {

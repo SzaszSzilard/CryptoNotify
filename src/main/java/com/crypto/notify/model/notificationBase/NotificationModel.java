@@ -1,5 +1,6 @@
 package com.crypto.notify.model.notificationBase;
 
+import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.model.notificationTypes.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -12,15 +13,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = "type" // JSON must include this field
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = PriceAboveModel.class, name = "n_above"),
-        @JsonSubTypes.Type(value = PriceBelowModel.class, name = "n_below"),
-        @JsonSubTypes.Type(value = PercentageAboveModel.class, name = "n_percent_above"),
-        @JsonSubTypes.Type(value = PercentageBelowModel.class, name = "n_percent_below"),
-        @JsonSubTypes.Type(value = ShortTermRally.class, name = "n_rally")
+        @JsonSubTypes.Type(value = PriceAboveModel.class, name = NotificationTypeConstants.N_ABOVE),
+        @JsonSubTypes.Type(value = PriceBelowModel.class, name = NotificationTypeConstants.N_BELOW),
+        @JsonSubTypes.Type(value = PercentageAboveModel.class, name = NotificationTypeConstants.N_PERCENT_ABOVE),
+        @JsonSubTypes.Type(value = PercentageBelowModel.class, name = NotificationTypeConstants.N_PERCENT_BELOW),
+        @JsonSubTypes.Type(value = ShortTermRally.class, name = NotificationTypeConstants.N_RALLY)
 })
 public abstract class NotificationModel {
     @JsonIgnore
-    protected String type = "n_generic";
+    protected String type = NotificationTypeConstants.N_GENERIC;
     protected Long id;
     protected final String userId;
     protected final String symbol;

@@ -9,7 +9,7 @@ public class DirectionChangeNotification extends NotificationModel {
     public DirectionChangeNotification(String userId, String symbol, String time) {
         super(userId, symbol);
         this.time = time;
-        this.type = "n_change";
+        this.type = "n-change";
     }
 
     public Mono<Boolean> shouldNotify() {
