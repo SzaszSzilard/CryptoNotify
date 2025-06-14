@@ -1,6 +1,5 @@
 package com.crypto.notify.controller;
 
-import com.crypto.notify.dto.CryptoPriceHistoryModel;
 import com.crypto.notify.service.KeyDbService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -30,7 +29,7 @@ public class DebugController {
 
     @GetMapping("/key-list/{key}")
     public Flux<String> keyList(@PathVariable String key) {
-        return keyDbService.getFullList(key);
+        return keyDbService.getAllCombinedKeys(key);
     }
 
     @DeleteMapping("/key/{key}")

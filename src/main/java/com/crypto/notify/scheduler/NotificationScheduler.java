@@ -1,5 +1,6 @@
 package com.crypto.notify.scheduler;
 
+import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.util.CryptoDTOMapper;
@@ -29,10 +30,10 @@ public class NotificationScheduler {
     @Scheduled(fixedRate = 1000*60)
     public void PriceTargetNotificationSender() {
         Flux.concat(
-                keyDbService.getFullList("n_above:*").map(cryptoDTOMapper::toPriceAbove),
-                keyDbService.getFullList("n_below:*").map(cryptoDTOMapper::toPriceBelow),
-                keyDbService.getFullList("n_percent_above:*").map(cryptoDTOMapper::toPercentageAbove),
-                keyDbService.getFullList("n_percent_below:*").map(cryptoDTOMapper::toPercentageBelow)
+                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_ABOVE + ":*").map(cryptoDTOMapper::toPriceAbove),
+                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":*").map(cryptoDTOMapper::toPriceBelow),
+                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":*").map(cryptoDTOMapper::toPercentageAbove),
+                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*").map(cryptoDTOMapper::toPercentageBelow)
         )
                 .flatMap(notification -> notificationService.priceTargetReached(notification)
                         .filter(Boolean::booleanValue)

@@ -44,4 +44,8 @@ public class KeyDbService {
     public Flux<String> getAllKeys() {
         return reactiveRedisTemplate.keys("*");
     }
+
+    public Flux<String> getAllCombinedKeys(String composedKey) {
+        return reactiveRedisTemplate.keys(composedKey).flatMap(this::getFullList);
+    }
 }
