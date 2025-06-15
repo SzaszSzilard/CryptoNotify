@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.*;
-
 @RestController
 @RequestMapping("/api/crypto")
 @CrossOrigin(origins = "*")
@@ -30,16 +28,15 @@ public class CryptoController {
     @GetMapping("/symbol/{querySymbol}")
     public Mono<CryptoPriceModel> getCryptoBySymbol(@PathVariable String querySymbol) {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .map(cryptoDTOMapper::toCryptoPrice)
-                .flatMapMany(Flux::fromIterable)
+                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
                 .filter(cryptoPrice -> cryptoPrice.symbol().equalsIgnoreCase(querySymbol))
                 .next();
     }
 
     @GetMapping("/list")
-    public Mono<List<CryptoPriceModel>> list() {
+    public Flux<CryptoPriceModel> list() {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .map(cryptoDTOMapper::toCryptoPrice);
+                .flatMapMany(cryptoDTOMapper::toCryptoPrice);
     }
 
     @GetMapping("/history")

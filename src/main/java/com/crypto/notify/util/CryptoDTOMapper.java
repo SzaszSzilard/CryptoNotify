@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -28,8 +29,8 @@ public class CryptoDTOMapper extends ObjectMapper {
         }
     }
 
-    public List<CryptoPriceModel> toCryptoPrice(String json) {
-        return importGeneric(json, new TypeReference<>() {});
+    public Flux<CryptoPriceModel> toCryptoPrice(String json) {
+        return Flux.fromIterable(importGeneric(json, new TypeReference<List<CryptoPriceModel>>() {}));
     }
 
     public CryptoPriceHistoryModel toCryptoPriceHistory(String json) {

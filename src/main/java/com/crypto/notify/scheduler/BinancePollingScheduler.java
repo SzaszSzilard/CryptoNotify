@@ -1,7 +1,6 @@
 package com.crypto.notify.scheduler;
 
 import com.crypto.notify.dto.CryptoPriceHistoryModel;
-import com.crypto.notify.dto.CryptoPriceModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.constants.Constants;
@@ -14,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Service
 public class BinancePollingScheduler {
@@ -42,13 +40,10 @@ public class BinancePollingScheduler {
                 .uri("api/v3/ticker/price")
                 .retrieve()
                 .bodyToMono(String.class)
-                .flatMap(response -> {
-                        List<CryptoPriceModel> prices = cryptoDTOMapper.toCryptoPrice(response).stream()
-                                .filter(price -> price.symbol().endsWith("USDT"))
-                                .toList();
-
-                        return keyDbService.saveValue(Constants.CRYPTO_PRICES, cryptoDTOMapper.toJson(prices));
-                })
+                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .filter(price -> price.symbol().endsWith("USDT"))
+                .collectList()
+                .flatMap(prices -> keyDbService.saveValue(Constants.CRYPTO_PRICES, cryptoDTOMapper.toJson(prices)))
                 .subscribe(saved -> {
                     if (!saved) {
                         log.error("Failed to save Binance data");
@@ -62,19 +57,18 @@ public class BinancePollingScheduler {
                 .uri("api/v3/ticker/price")
                 .retrieve()
                 .bodyToMono(String.class)
-                .flatMap(response -> {
-                    List<CryptoPriceModel> prices = cryptoDTOMapper.toCryptoPrice(response).stream()
-                            .filter(price -> price.symbol().contains("USDT"))
-                            .toList();
-
+                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .filter(price -> price.symbol().contains("USDT"))
+                .collectList()
+                .flatMap(prices -> {
                     LocalDateTime now = LocalDateTime.now();
                     String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     String time = now.format(DateTimeFormatter.ofPattern("HH:mm"));
 
-                    CryptoPriceHistoryModel cryptoPriceHistoryModell = new CryptoPriceHistoryModel(time, prices);
+                    CryptoPriceHistoryModel cryptoPriceHistoryModel = new CryptoPriceHistoryModel(time, prices);
 
-                    return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoPriceHistoryModell));
+                    return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoPriceHistoryModel));
                 })
-                .subscribe(saved -> log.info("Binance data saved for history"));
+                .subscribe(saved -> log.info("Binance data saved for history index: {}", saved));
     }
 }

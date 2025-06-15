@@ -24,11 +24,9 @@ public class NotificationService {
 
     public Mono<Boolean> priceTargetReached(PriceTargetNotificationModel notification) {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .map(cryptoDTOMapper::toCryptoPrice)
-                .map(cryptoList -> cryptoList.stream()
-                        .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
-                        .findFirst()
-                        .orElse(null))
+                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
+                .next() // return first matching Crypto
                 .map(cryptoPrice -> notification.shouldNotify(cryptoPrice.price()));
     }
 
