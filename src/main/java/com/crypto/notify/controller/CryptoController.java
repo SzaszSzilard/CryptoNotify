@@ -1,7 +1,7 @@
 package com.crypto.notify.controller;
 
-import com.crypto.notify.dto.CryptoPriceHistoryModel;
-import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.dto.CryptoHistoryModel;
+import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.constants.Constants;
 import com.crypto.notify.util.CryptoDTOMapper;
@@ -26,7 +26,7 @@ public class CryptoController {
     }
 
     @GetMapping("/symbol/{querySymbol}")
-    public Mono<CryptoPriceModel> getCryptoBySymbol(@PathVariable String querySymbol) {
+    public Mono<CryptoModel> getCryptoBySymbol(@PathVariable String querySymbol) {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
                 .flatMapMany(cryptoDTOMapper::toCryptoPrice)
                 .filter(cryptoPrice -> cryptoPrice.symbol().equalsIgnoreCase(querySymbol))
@@ -34,13 +34,13 @@ public class CryptoController {
     }
 
     @GetMapping("/list")
-    public Flux<CryptoPriceModel> list() {
+    public Flux<CryptoModel> list() {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
                 .flatMapMany(cryptoDTOMapper::toCryptoPrice);
     }
 
     @GetMapping("/history")
-    public Flux<CryptoPriceHistoryModel> history(@RequestParam String date) {
+    public Flux<CryptoHistoryModel> history(@RequestParam String date) {
         return keyDbService.getFullList("chp-" + date)
                 .map(cryptoDTOMapper::toCryptoPriceHistory);
     }

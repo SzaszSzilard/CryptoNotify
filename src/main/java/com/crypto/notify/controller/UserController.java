@@ -1,6 +1,6 @@
 package com.crypto.notify.controller;
 
-import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,12 +21,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/favorites")
-    public Mono<List<CryptoPriceModel>> userFavorites(@PathVariable String id) {
+    public Mono<List<CryptoModel>> userFavorites(@PathVariable String id) {
         return userService.getFavoriteCryptos(id);
     }
 
     @GetMapping("/{id}/notifications")
-    public Mono<List<CryptoPriceModel>> userNotifications(@PathVariable String id) {
+    public Mono<List<CryptoModel>> userNotifications(@PathVariable String id) {
         return userService.getMyNotificaitons(id);
     }
 }

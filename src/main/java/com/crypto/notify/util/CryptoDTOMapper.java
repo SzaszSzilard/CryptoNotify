@@ -1,7 +1,7 @@
 package com.crypto.notify.util;
 
-import com.crypto.notify.dto.CryptoPriceHistoryModel;
-import com.crypto.notify.dto.CryptoPriceModel;
+import com.crypto.notify.dto.CryptoHistoryModel;
+import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.model.notificationTypes.PercentageAboveModel;
 import com.crypto.notify.model.notificationTypes.PercentageBelowModel;
 import com.crypto.notify.model.notificationTypes.PriceAboveModel;
@@ -29,11 +29,11 @@ public class CryptoDTOMapper extends ObjectMapper {
         }
     }
 
-    public Flux<CryptoPriceModel> toCryptoPrice(String json) {
-        return Flux.fromIterable(importGeneric(json, new TypeReference<List<CryptoPriceModel>>() {}));
+    public Flux<CryptoModel> toCryptoPrice(String json) {
+        return Flux.fromIterable(importGeneric(json, new TypeReference<List<CryptoModel>>() {}));
     }
 
-    public CryptoPriceHistoryModel toCryptoPriceHistory(String json) {
+    public CryptoHistoryModel toCryptoPriceHistory(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 

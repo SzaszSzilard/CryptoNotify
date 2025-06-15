@@ -1,9 +1,7 @@
 package com.crypto.notify.service;
 
-import com.crypto.notify.dto.CryptoPriceModel;
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import com.crypto.notify.dto.CryptoModel;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
@@ -17,7 +15,7 @@ public class UserService {
         this.keyDbService = keyDbService;
     }
 
-    public Mono<List<CryptoPriceModel>> getFavoriteCryptos(String userId) {
+    public Mono<List<CryptoModel>> getFavoriteCryptos(String userId) {
 //        keyDbService.getValue("user_favorites_" + userId)
 //                .flatMapMany(favorites -> {
 //                    if (favorites == null || favorites.isEmpty()) {
@@ -34,7 +32,7 @@ public class UserService {
         return Mono.just(new ArrayList<>());
     }
 
-    public Mono<List<CryptoPriceModel>> getMyNotificaitons(String userId) {
+    public Mono<List<CryptoModel>> getMyNotificaitons(String userId) {
         return Mono.just(new ArrayList<>());
     }
 }

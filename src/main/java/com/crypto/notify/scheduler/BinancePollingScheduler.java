@@ -1,6 +1,6 @@
 package com.crypto.notify.scheduler;
 
-import com.crypto.notify.dto.CryptoPriceHistoryModel;
+import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.constants.Constants;
@@ -65,9 +65,9 @@ public class BinancePollingScheduler {
                     String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
                     String time = now.format(DateTimeFormatter.ofPattern("HH:mm"));
 
-                    CryptoPriceHistoryModel cryptoPriceHistoryModel = new CryptoPriceHistoryModel(time, prices);
+                    CryptoHistoryModel cryptoHistoryModel = new CryptoHistoryModel(time, prices);
 
-                    return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoPriceHistoryModel));
+                    return keyDbService.pushIntoList(key, cryptoDTOMapper.toJson(cryptoHistoryModel));
                 })
                 .subscribe(saved -> log.info("Binance data saved for history index: {}", saved));
     }
