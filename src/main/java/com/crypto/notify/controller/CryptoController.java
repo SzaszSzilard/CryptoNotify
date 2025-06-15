@@ -27,6 +27,15 @@ public class CryptoController {
         this.cryptoDTOMapper = cryptoDTOMapper;
     }
 
+    @GetMapping("/symbol/{querySymbol}")
+    public Mono<CryptoPriceModel> getCryptoBySymbol(@PathVariable String querySymbol) {
+        return keyDbService.getValue(Constants.CRYPTO_PRICES)
+                .map(cryptoDTOMapper::toCryptoPrice)
+                .flatMapMany(Flux::fromIterable)
+                .filter(cryptoPrice -> cryptoPrice.symbol().equalsIgnoreCase(querySymbol))
+                .next();
+    }
+
     @GetMapping("/list")
     public Mono<List<CryptoPriceModel>> list() {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
