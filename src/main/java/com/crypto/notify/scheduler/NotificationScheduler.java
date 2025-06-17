@@ -3,6 +3,7 @@ package com.crypto.notify.scheduler;
 import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
+import com.crypto.notify.service.PushNotificationService;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,14 +18,17 @@ public class NotificationScheduler {
     private final CryptoDTOMapper cryptoDTOMapper;
     private final Logger log = LoggerFactory.getLogger(NotificationScheduler.class);
     private final NotificationService notificationService;
+    private final PushNotificationService pushNotificationService;
 
 
     public NotificationScheduler(KeyDbService keyDbService,
                                  CryptoDTOMapper cryptoDTOMapper,
-                                 NotificationService notificationService) {
+                                 NotificationService notificationService,
+                                 PushNotificationService pushNotificationService) {
         this.keyDbService = keyDbService;
         this.cryptoDTOMapper = cryptoDTOMapper;
         this.notificationService = notificationService;
+        this.pushNotificationService = pushNotificationService;
     }
 
     @Scheduled(fixedRate = 1000*60)
@@ -39,7 +43,12 @@ public class NotificationScheduler {
                         .filter(Boolean::booleanValue)
                         .flatMap(_ -> {
                             log.info("Price target reached for notification, type: {}, id: {}", notification.getType(), notification.getId());
-                            // Implement push notification
+                            log.info("ID: {}", notification.getUserId());
+                            PushNotificationService.sendPushNotification(
+                                    "Crypto Price Alert!",
+                                    "Price target reached for: " + notification.getId(),
+                                    notification.getUserId()
+                            );
                             return notificationService.delete(notification)
                                     .doOnSuccess(s -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
                         })
