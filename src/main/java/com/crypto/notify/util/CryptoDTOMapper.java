@@ -1,5 +1,6 @@
 package com.crypto.notify.util;
 
+import com.crypto.notify.controller.CryptoController;
 import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.model.notificationTypes.PercentageAboveModel;
@@ -9,6 +10,8 @@ import com.crypto.notify.model.notificationTypes.PriceBelowModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -16,6 +19,8 @@ import java.util.List;
 
 @Component
 public class CryptoDTOMapper extends ObjectMapper {
+    private final Logger log = LoggerFactory.getLogger(CryptoDTOMapper.class);
+
     public CryptoDTOMapper() {
         super();
         this.findAndRegisterModules();
@@ -41,6 +46,7 @@ public class CryptoDTOMapper extends ObjectMapper {
         try {
             return this.readValue(json, ref);
         } catch (JsonProcessingException e) {
+            log.error("Failed to map JSON: {}", json, e);
             throw new RuntimeException("JSON mapping failed", e);
         }
     }

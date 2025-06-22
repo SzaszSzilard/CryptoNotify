@@ -11,4 +11,15 @@ public class PercentageBelowModel extends PercentageChangeModel {
     public boolean shouldNotify(Double currentPrice) {
         return currentPrice < this.price * (1 - this.percentage / 100);
     }
+
+    public String getNotificationTitle() {
+        return String.format("%s Falls!", this.symbol);
+    }
+
+    public String getNotificationMessage() {
+        return String.format(
+            "The price of %s has fallen %.2f%% percent, now its below %.2f%%",
+            this.symbol, this.percentage, this.price * (1 - this.percentage / 100)
+        );
+    }
 }

@@ -42,11 +42,9 @@ public class NotificationScheduler {
                 .flatMap(notification -> notificationService.priceTargetReached(notification)
                         .filter(Boolean::booleanValue)
                         .flatMap(_ -> {
-                            log.info("Price target reached for notification, type: {}, id: {}", notification.getType(), notification.getId());
-                            log.info("ID: {}", notification.getUserId());
                             PushNotificationService.sendPushNotification(
-                                    "Crypto Price Alert!",
-                                    "Price target reached for: " + notification.getId(),
+                                    notification.getNotificationTitle(),
+                                    notification.getNotificationMessage(),
                                     notification.getUserId()
                             );
                             return notificationService.delete(notification)

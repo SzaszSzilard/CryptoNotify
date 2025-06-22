@@ -11,4 +11,12 @@ public class PriceBelowModel extends PriceTargetNotificationModel {
     public boolean shouldNotify(Double currentPrice) {
         return currentPrice < this.price;
     }
+
+    public String getNotificationTitle() {
+        return String.format("%s Falls!", this.symbol);
+    }
+
+    public String getNotificationMessage() {
+        return String.format("The price of %s has fallen below the target price of %.2f.", this.symbol, this.price);
+    }
 }
