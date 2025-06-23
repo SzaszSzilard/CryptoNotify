@@ -3,6 +3,7 @@ package com.crypto.notify.util;
 import com.crypto.notify.controller.CryptoController;
 import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
+import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationTypes.PercentageAboveModel;
 import com.crypto.notify.model.notificationTypes.PercentageBelowModel;
 import com.crypto.notify.model.notificationTypes.PriceAboveModel;
@@ -52,6 +53,10 @@ public class CryptoDTOMapper extends ObjectMapper {
     }
 
     public PriceAboveModel toPriceAbove(String json) {
+        return importGeneric(json, new TypeReference<>() {});
+    }
+
+    public NotificationModel toNotification(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 
