@@ -17,6 +17,6 @@ public class PriceAboveModel extends PriceTargetNotificationModel {
     }
 
     public String getNotificationMessage() {
-        return String.format("The price of %s has risen above the target price of %.2f.", this.symbol, this.price);
+        return String.format("The price of %s has risen above your target of %.2f.", this.symbol, this.price);
     }
 }

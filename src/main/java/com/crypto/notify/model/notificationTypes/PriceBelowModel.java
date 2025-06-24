@@ -17,6 +17,6 @@ public class PriceBelowModel extends PriceTargetNotificationModel {
     }
 
     public String getNotificationMessage() {
-        return String.format("The price of %s has fallen below the target price of %.2f.", this.symbol, this.price);
+        return String.format("The price of %s has fallen below your target of %.2f.", this.symbol, this.price);
     }
 }

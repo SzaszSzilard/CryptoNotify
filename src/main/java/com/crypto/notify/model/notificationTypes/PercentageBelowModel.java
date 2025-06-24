@@ -18,7 +18,7 @@ public class PercentageBelowModel extends PercentageChangeModel {
 
     public String getNotificationMessage() {
         return String.format(
-            "The price of %s has fallen %.2f%% percent, now its below %.2f%%",
+            "The price of %s has fallen %.2f%% percent, now its below your target of %.2f%%",
             this.symbol, this.percentage, this.price * (1 - this.percentage / 100)
         );
     }
