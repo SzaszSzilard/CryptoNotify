@@ -41,8 +41,8 @@ public class KeyDbService {
         return reactiveRedisTemplate.opsForList().range(key, 0, -1);
     }
 
-    public Flux<String> getAllKeys() {
-        return reactiveRedisTemplate.keys("*");
+    public Flux<String> getKeys(String pattern) {
+        return reactiveRedisTemplate.keys(pattern);
     }
 
     public Flux<String> getAllCombinedKeys(String composedKey) {

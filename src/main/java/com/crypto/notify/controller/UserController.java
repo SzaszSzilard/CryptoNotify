@@ -25,11 +25,9 @@ public class UserController {
 
     @GetMapping("/{id}/notifications")
     public Flux<NotificationModel> userNotifications(@PathVariable String id) {
-        return Flux.concat(
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_ABOVE + ":" + id),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":" + id),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":" + id),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":" + id)
-        ).map(cryptoDTOMapper::toNotification);
+        return keyDbService.getKeys("*:" + id)
+                .filter(key -> !key.startsWith("idc:"))
+                .flatMap(key -> keyDbService.getFullList(key))
+                .map(cryptoDTOMapper::toNotification);
     }
 }

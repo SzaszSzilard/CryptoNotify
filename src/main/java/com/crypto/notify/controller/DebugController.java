@@ -39,7 +39,7 @@ public class DebugController {
 
     @GetMapping("/keys/")
     public Mono<List<String>> keys() {
-        return keyDbService.getAllKeys().collectList();
+        return keyDbService.getKeys("*").collectList();
     }
 
     @GetMapping("/threads")
