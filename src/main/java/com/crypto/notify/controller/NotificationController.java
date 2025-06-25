@@ -18,6 +18,11 @@ public class NotificationController {
         return notificationService.save(notification);
     }
 
+    @DeleteMapping("/")
+    public Mono<Long> delete(@RequestBody NotificationModel notification) {
+        return notificationService.delete(notification);
+    }
+
 //    // Debugging endpoints
 //    @PostMapping("/nabovet")
 //    public Mono<Boolean> a(@RequestBody PriceAboveModel notification) {
