@@ -1,7 +1,5 @@
 package com.crypto.notify.model.notificationBase;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.List;
 
 public abstract class NonTargetNotificationModel extends NotificationModel {
@@ -12,7 +10,6 @@ public abstract class NonTargetNotificationModel extends NotificationModel {
         this.time = time;
     }
 
-    @JsonIgnore
     public String getTime() {
         return time;
     }
