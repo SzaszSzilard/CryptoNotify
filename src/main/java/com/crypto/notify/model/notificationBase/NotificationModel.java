@@ -1,7 +1,7 @@
 package com.crypto.notify.model.notificationBase;
 
 import com.crypto.notify.constants.NotificationTypeConstants;
-import com.crypto.notify.model.notificationTypes.*;
+import com.crypto.notify.model.notificationType.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -17,7 +17,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = PriceBelowModel.class, name = NotificationTypeConstants.N_BELOW),
         @JsonSubTypes.Type(value = PercentageAboveModel.class, name = NotificationTypeConstants.N_PERCENT_ABOVE),
         @JsonSubTypes.Type(value = PercentageBelowModel.class, name = NotificationTypeConstants.N_PERCENT_BELOW),
-        @JsonSubTypes.Type(value = ShortTermRally.class, name = NotificationTypeConstants.N_RALLY)
+        @JsonSubTypes.Type(value = RallyModel.class, name = NotificationTypeConstants.N_RALLY)
 })
 public abstract class NotificationModel {
     @JsonIgnore

@@ -40,7 +40,7 @@ public class BinancePollingScheduler {
                 .uri("api/v3/ticker/price")
                 .retrieve()
                 .bodyToMono(String.class)
-                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .flatMapMany(cryptoDTOMapper::toCrypto)
                 .filter(price -> price.symbol().endsWith("USDT"))
                 .collectList()
                 .flatMap(prices -> keyDbService.saveValue(Constants.CRYPTO_PRICES, cryptoDTOMapper.toJson(prices)))
@@ -57,7 +57,7 @@ public class BinancePollingScheduler {
                 .uri("api/v3/ticker/price")
                 .retrieve()
                 .bodyToMono(String.class)
-                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .flatMapMany(cryptoDTOMapper::toCrypto)
                 .filter(price -> price.symbol().contains("USDT"))
                 .collectList()
                 .flatMap(prices -> {

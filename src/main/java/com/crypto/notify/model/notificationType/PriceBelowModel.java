@@ -1,11 +1,12 @@
-package com.crypto.notify.model.notificationTypes;
+package com.crypto.notify.model.notificationType;
 
+import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 
 public class PriceBelowModel extends PriceTargetNotificationModel {
     public PriceBelowModel(String userId, String symbol, Double price) {
         super(userId, symbol, price);
-        this.type = "n-below";
+        this.type = NotificationTypeConstants.N_BELOW;
      }
 
     public boolean shouldNotify(Double currentPrice) {
@@ -17,6 +18,6 @@ public class PriceBelowModel extends PriceTargetNotificationModel {
     }
 
     public String getNotificationMessage() {
-        return String.format("The price of %s has fallen below your target of %.2f.", this.symbol, this.price);
+        return String.format("The price of %s has fallen below your target of %.2f!", this.symbol, this.price);
     }
 }

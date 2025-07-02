@@ -28,7 +28,7 @@ public class CryptoController {
     @GetMapping("/symbol/{querySymbol}")
     public Mono<CryptoModel> getCryptoBySymbol(@PathVariable String querySymbol) {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+                .flatMapMany(cryptoDTOMapper::toCrypto)
                 .filter(cryptoPrice -> cryptoPrice.symbol().equalsIgnoreCase(querySymbol))
                 .next();
     }
@@ -36,12 +36,12 @@ public class CryptoController {
     @GetMapping("/list")
     public Flux<CryptoModel> list() {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCryptoPrice);
+                .flatMapMany(cryptoDTOMapper::toCrypto);
     }
 
     @GetMapping("/history")
     public Flux<CryptoHistoryModel> history(@RequestParam String date) {
         return keyDbService.getFullList("chp-" + date)
-                .map(cryptoDTOMapper::toCryptoPriceHistory);
+                .map(cryptoDTOMapper::toCryptoHistory);
     }
 }

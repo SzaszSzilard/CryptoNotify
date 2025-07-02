@@ -34,19 +34,18 @@
   },
 
   "rally": {
-    "type":"n_change",
+    "type":"n_rally",
     "id": 777,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
-    "percentage": 10.0,
-    "time": "5,10,30,60,3600"
+    "time": "60|120|240|480|720|1440"
   },
 
   "changeOfDirection": {
-    "type":"n_rally",
+    "type":"n_change",
     "id": 999,
     "userId": "XAFA",
     "symbol": "BTCUSDT",
-    "time": "5,10,30,60,3600"
+    "time": "60|120|240|480|720|1440"
   }
 }

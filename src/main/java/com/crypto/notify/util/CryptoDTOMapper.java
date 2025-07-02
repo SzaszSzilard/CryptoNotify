@@ -1,13 +1,10 @@
 package com.crypto.notify.util;
 
-import com.crypto.notify.controller.CryptoController;
 import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.model.notificationBase.NotificationModel;
-import com.crypto.notify.model.notificationTypes.PercentageAboveModel;
-import com.crypto.notify.model.notificationTypes.PercentageBelowModel;
-import com.crypto.notify.model.notificationTypes.PriceAboveModel;
-import com.crypto.notify.model.notificationTypes.PriceBelowModel;
+import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
+import com.crypto.notify.model.notificationType.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,11 +32,11 @@ public class CryptoDTOMapper extends ObjectMapper {
         }
     }
 
-    public Flux<CryptoModel> toCryptoPrice(String json) {
+    public Flux<CryptoModel> toCrypto(String json) {
         return Flux.fromIterable(importGeneric(json, new TypeReference<List<CryptoModel>>() {}));
     }
 
-    public CryptoHistoryModel toCryptoPriceHistory(String json) {
+    public CryptoHistoryModel toCryptoHistory(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 
@@ -52,7 +49,11 @@ public class CryptoDTOMapper extends ObjectMapper {
         }
     }
 
-    public PriceAboveModel toPriceAbove(String json) {
+    public RallyModel toRally(String json) {
+        return importGeneric(json, new TypeReference<>() {});
+    }
+
+    public PriceTargetNotificationModel toPriceTarget(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 
@@ -60,15 +61,4 @@ public class CryptoDTOMapper extends ObjectMapper {
         return importGeneric(json, new TypeReference<>() {});
     }
 
-    public PriceBelowModel toPriceBelow(String json) {
-        return importGeneric(json, new TypeReference<>() {});
-    }
-
-    public PercentageAboveModel toPercentageAbove(String json) {
-        return importGeneric(json, new TypeReference<>() {});
-    }
-
-    public PercentageBelowModel toPercentageBelow(String json) {
-        return importGeneric(json, new TypeReference<>() {});
-    }
 }

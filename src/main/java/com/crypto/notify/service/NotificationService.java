@@ -1,5 +1,6 @@
 package com.crypto.notify.service;
 
+import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import com.crypto.notify.constants.Constants;
@@ -7,6 +8,7 @@ import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -22,9 +24,8 @@ public class NotificationService {
         this.cryptoDTOMapper = cryptoDTOMapper;
     }
 
-    public Mono<Boolean> priceTargetReached(PriceTargetNotificationModel notification) {
-        return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCryptoPrice)
+    public Mono<Boolean> priceTargetReached(PriceTargetNotificationModel notification, Flux<CryptoModel> cryptoPrices) {
+        return cryptoPrices
                 .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
                 .next() // return first matching Crypto
                 .map(cryptoPrice -> notification.shouldNotify(cryptoPrice.price()));

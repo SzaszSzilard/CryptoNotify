@@ -37,6 +37,10 @@ public class KeyDbService {
         return reactiveRedisTemplate.opsForList().leftPush(key, value);
     }
 
+    public Flux<String> getList(String key, int start, int end) {
+        return reactiveRedisTemplate.opsForList().range(key, start, end);
+    }
+
     public Flux<String> getFullList(String key) {
         return reactiveRedisTemplate.opsForList().range(key, 0, -1);
     }
