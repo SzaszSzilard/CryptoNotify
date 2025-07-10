@@ -13,6 +13,4 @@ public abstract class NonTargetNotificationModel extends NotificationModel {
     public String getTime() {
         return time;
     }
-
-    public abstract double shouldNotify(List<Double> prices);
 }

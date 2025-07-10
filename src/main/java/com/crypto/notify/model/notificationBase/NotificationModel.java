@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.List;
+
 
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
@@ -17,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         @JsonSubTypes.Type(value = PriceBelowModel.class, name = NotificationTypeConstants.N_BELOW),
         @JsonSubTypes.Type(value = PercentageAboveModel.class, name = NotificationTypeConstants.N_PERCENT_ABOVE),
         @JsonSubTypes.Type(value = PercentageBelowModel.class, name = NotificationTypeConstants.N_PERCENT_BELOW),
-        @JsonSubTypes.Type(value = RallyModel.class, name = NotificationTypeConstants.N_RALLY)
+        @JsonSubTypes.Type(value = RallyModel.class, name = NotificationTypeConstants.N_RALLY),
+        @JsonSubTypes.Type(value = DirectionChangeModel.class, name = NotificationTypeConstants.N_CHANGE)
 })
 public abstract class NotificationModel {
     @JsonIgnore
@@ -50,4 +53,12 @@ public abstract class NotificationModel {
     public String getType() {
         return type;
     }
+
+    public abstract double shouldNotify(List<Double> price);
+
+    @JsonIgnore
+    public abstract String getNotificationTitle();
+
+    @JsonIgnore
+    public abstract String getNotificationMessage(Object... params);
 }

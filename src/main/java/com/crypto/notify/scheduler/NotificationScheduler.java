@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,7 +52,7 @@ public class NotificationScheduler {
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*")
             ).map(cryptoDTOMapper::toPriceTarget)
                 .flatMap(notification -> notificationService.priceTargetReached(notification, cryptoPrices)
-                        .filter(Boolean::booleanValue)
+                        .filter(result -> result != 0)
                         .flatMap(_ -> {
                             PushNotificationService.sendPushNotification(
                                     notification.getNotificationTitle(),
@@ -75,32 +74,38 @@ public class NotificationScheduler {
         keyDbService.getList(key, -12, -1)
                 .map(cryptoDTOMapper::toCryptoHistory)
                 .collectList()
-                .flatMapMany(cryptoHistories ->
-                        keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*")
-                                .map(cryptoDTOMapper::toRally)
-                                .flatMap(notification_rally -> {
-                                    List<Double> last12prices = cryptoHistories.stream()
-                                            .map(cryptoHistory -> cryptoHistory.priceList().stream()
-                                                    .filter(crypto -> crypto.symbol().equals(notification_rally.getSymbol()))
-                                                    .findFirst()
-                                                    .map(CryptoModel::price)
-                                            )
-                                            .flatMap(Optional::stream)
-                                            .toList();
+                .flatMapMany(cryptoHistories -> {
+                    if (cryptoHistories.size() < 12) {
+                        return Flux.empty();
+                    }
+                    return Flux.concat(
+                                    keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
+                                    keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
+                            )
+                            .map(cryptoDTOMapper::toNonTargetNotification)
+                            .flatMap(notification_rally -> {
+                                List<Double> last12prices = cryptoHistories.stream()
+                                        .map(cryptoHistory -> cryptoHistory.priceList().stream()
+                                                .filter(crypto -> crypto.symbol().equals(notification_rally.getSymbol()))
+                                                .findFirst()
+                                                .map(CryptoModel::price)
+                                        )
+                                        .flatMap(Optional::stream)
+                                        .toList();
 
-                                    double gain = notification_rally.shouldNotify(last12prices);
-                                    if (gain != 0) {
-                                        PushNotificationService.sendPushNotification(
-                                                "Price Trend Reversal Detected",
-                                                "A price trend reversal has been detected for " + notification_rally.getSymbol(),
-                                                notification_rally.getUserId()
-                                        );
-                                        return notificationService.delete(notification_rally)
-                                                .doOnSuccess(s -> log.info("Price trend reversal notification deleted, symbol: {}, id: {}", notification_rally.getSymbol(), notification_rally.getId()));
-                                    }
-                                    return Mono.empty();
-                                })
-                )
+                                double gain = notification_rally.shouldNotify(last12prices);
+                                if (gain != 0) {
+                                    PushNotificationService.sendPushNotification(
+                                            notification_rally.getNotificationTitle(),
+                                            notification_rally.getNotificationMessage(List.of(gain)),
+                                            notification_rally.getUserId()
+                                    );
+                                    return notificationService.delete(notification_rally)
+                                            .doOnSuccess(s -> log.info("Price trend reversal notification deleted, symbol: {}, id: {}", notification_rally.getSymbol(), notification_rally.getId()));
+                                }
+                                return Flux.empty();
+                            });
+                })
                 .subscribe();
     }
 }

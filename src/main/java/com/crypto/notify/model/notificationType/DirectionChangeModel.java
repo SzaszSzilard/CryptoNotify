@@ -10,7 +10,7 @@ public class DirectionChangeModel extends NonTargetNotificationModel {
 
     public DirectionChangeModel(String userId, String symbol, String time) {
         super(userId, symbol, time);
-        this.type = NotificationTypeConstants.N_DIRECTION_CHANGE;
+        this.type = NotificationTypeConstants.N_CHANGE;
     }
 
     private boolean consistent(long trend, long windowSize) {
@@ -45,5 +45,17 @@ public class DirectionChangeModel extends NonTargetNotificationModel {
         }
 
         return 0;
+    }
+
+    @Override
+    public String getNotificationTitle() {
+        return String.format("%s price trend reversal!", this.symbol);
+    }
+
+    @Override
+    public String getNotificationMessage(Object... params) {
+        return String.format("In last hour the trend changed from %s to %s.",
+                params[0].equals(1) ? "rising" : "falling",
+                params[0].equals(1) ? "falling" : "rising");
     }
 }

@@ -14,6 +14,7 @@ public class RallyModel extends NonTargetNotificationModel {
     }
 
 
+    @Override
     public double shouldNotify(List<Double> prices) {
         double threshold = 2.0;
         double gain = (prices.getLast() - prices.getFirst()) / prices.getFirst() * 100;
@@ -26,8 +27,20 @@ public class RallyModel extends NonTargetNotificationModel {
         boolean consistent = risingSteps >= prices.size() * 0.75;
         boolean isRally = consistent && strongEnough;
 
-        return isRally ? gain : 0 ;
+        return isRally ? gain : 0;
     }
 
+    @Override
+    public String getNotificationTitle() {
+        return String.format("%s is on a rally!", this.symbol);
+    }
 
+    @Override
+    public String getNotificationMessage(Object... params) {
+        return String.format(
+                "In last hour it has %s %.2f%%.",
+                ((double) params[0] > 0) ? "Risen" : "Fallen",
+                Math.abs((double) params[0])
+        );
+    }
 }

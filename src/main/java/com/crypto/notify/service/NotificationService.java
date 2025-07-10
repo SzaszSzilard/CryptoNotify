@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Service
 public class NotificationService {
     private final KeyDbService keyDbService;
@@ -24,11 +26,11 @@ public class NotificationService {
         this.cryptoDTOMapper = cryptoDTOMapper;
     }
 
-    public Mono<Boolean> priceTargetReached(PriceTargetNotificationModel notification, Flux<CryptoModel> cryptoPrices) {
+    public Mono<Double> priceTargetReached(PriceTargetNotificationModel notification, Flux<CryptoModel> cryptoPrices) {
         return cryptoPrices
                 .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
                 .next() // return first matching Crypto
-                .map(cryptoPrice -> notification.shouldNotify(cryptoPrice.price()));
+                .map(cryptoPrice -> notification.shouldNotify(List.of(cryptoPrice.price())));
     }
 
     public Mono<Long> save(NotificationModel notification) {

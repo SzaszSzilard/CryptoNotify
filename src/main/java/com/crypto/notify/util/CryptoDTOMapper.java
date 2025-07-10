@@ -2,6 +2,7 @@ package com.crypto.notify.util;
 
 import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
+import com.crypto.notify.model.notificationBase.NonTargetNotificationModel;
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import com.crypto.notify.model.notificationType.*;
@@ -49,7 +50,7 @@ public class CryptoDTOMapper extends ObjectMapper {
         }
     }
 
-    public RallyModel toRally(String json) {
+    public NonTargetNotificationModel toNonTargetNotification(String json) {
         return importGeneric(json, new TypeReference<>() {});
     }
 
