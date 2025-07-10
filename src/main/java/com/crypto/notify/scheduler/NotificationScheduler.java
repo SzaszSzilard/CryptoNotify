@@ -25,17 +25,14 @@ public class NotificationScheduler {
     private final CryptoDTOMapper cryptoDTOMapper;
     private final Logger log = LoggerFactory.getLogger(NotificationScheduler.class);
     private final NotificationService notificationService;
-    private final PushNotificationService pushNotificationService;
 
 
     public NotificationScheduler(KeyDbService keyDbService,
                                  CryptoDTOMapper cryptoDTOMapper,
-                                 NotificationService notificationService,
-                                 PushNotificationService pushNotificationService) {
+                                 NotificationService notificationService) {
         this.keyDbService = keyDbService;
         this.cryptoDTOMapper = cryptoDTOMapper;
         this.notificationService = notificationService;
-        this.pushNotificationService = pushNotificationService;
     }
 
     @Scheduled(fixedRate = 1000*60)
