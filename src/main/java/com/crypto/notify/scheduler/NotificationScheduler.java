@@ -83,25 +83,25 @@ public class NotificationScheduler {
                                     keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
                             )
                             .map(cryptoDTOMapper::toNonTargetNotification)
-                            .flatMap(notification_rally -> {
+                            .flatMap(notification -> {
                                 List<Double> last12prices = cryptoHistories.stream()
                                         .map(cryptoHistory -> cryptoHistory.priceList().stream()
-                                                .filter(crypto -> crypto.symbol().equals(notification_rally.getSymbol()))
+                                                .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
                                                 .findFirst()
                                                 .map(CryptoModel::price)
                                         )
                                         .flatMap(Optional::stream)
                                         .toList();
 
-                                double gain = notification_rally.shouldNotify(last12prices);
+                                double gain = notification.shouldNotify(last12prices);
                                 if (gain != 0) {
                                     PushNotificationService.sendPushNotification(
-                                            notification_rally.getNotificationTitle(),
-                                            notification_rally.getNotificationMessage(List.of(gain)),
-                                            notification_rally.getUserId()
+                                            notification.getNotificationTitle(),
+                                            notification.getNotificationMessage(List.of(gain)),
+                                            notification.getUserId()
                                     );
-                                    return notificationService.delete(notification_rally)
-                                            .doOnSuccess(s -> log.info("Price trend reversal notification deleted, symbol: {}, id: {}", notification_rally.getSymbol(), notification_rally.getId()));
+                                    return notificationService.delete(notification)
+                                            .doOnSuccess(s -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
                                 }
                                 return Flux.empty();
                             });
