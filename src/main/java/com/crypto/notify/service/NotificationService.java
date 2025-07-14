@@ -30,7 +30,9 @@ public class NotificationService {
         return cryptoPrices
                 .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
                 .next() // return first matching Crypto
-                .map(cryptoPrice -> notification.shouldNotify(List.of(cryptoPrice.price())));
+                .map(CryptoModel::price)
+                .map(List::of)
+                .map(notification::shouldNotify);
     }
 
     public Mono<Long> save(NotificationModel notification) {
