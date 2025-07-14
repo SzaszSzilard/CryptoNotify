@@ -47,7 +47,7 @@ public class NotificationScheduler {
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":*"),
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":*"),
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*")
-            ).map(cryptoDTOMapper::toPriceTarget)
+            ).map(cryptoDTOMapper::toPriceTarget).cache()
                 .flatMap(notification -> notificationService.priceTargetReached(notification, cryptoPrices)
                         .filter(result -> result != 0)
                         .flatMap(_ -> {
