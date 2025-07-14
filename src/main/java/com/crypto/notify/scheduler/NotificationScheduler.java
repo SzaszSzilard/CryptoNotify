@@ -2,6 +2,7 @@ package com.crypto.notify.scheduler;
 
 import com.crypto.notify.constants.Constants;
 import com.crypto.notify.constants.NotificationTypeConstants;
+import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
@@ -12,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class NotificationScheduler {
@@ -57,52 +58,49 @@ public class NotificationScheduler {
                                     notification.getUserId()
                             );
                             return notificationService.delete(notification)
-                                    .doOnSuccess(s -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
+                                    .doOnSuccess(_ -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
                         })
                 )
         ).subscribe();
     }
 
     @Scheduled(fixedRate = 1000*60)
-    public void PriceTrendReversalNotificationSender() {
+    public void NonPriceTargetNotificationSender() {
         LocalDateTime now = LocalDateTime.now();
         String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        keyDbService.getList(key, -12, -1)
+        Flux<CryptoHistoryModel> cryptoHistories = keyDbService.getList(key, -12, -1)
                 .map(cryptoDTOMapper::toCryptoHistory)
-                .collectList()
-                .flatMapMany(cryptoHistories -> {
-                    if (cryptoHistories.size() < 12) {
-                        return Flux.empty();
-                    }
-                    return Flux.concat(
-                                    keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
-                                    keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
-                            )
-                            .map(cryptoDTOMapper::toNonTargetNotification)
-                            .flatMap(notification -> {
-                                List<Double> last12prices = cryptoHistories.stream()
-                                        .map(cryptoHistory -> cryptoHistory.priceList().stream()
-                                                .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
-                                                .findFirst()
-                                                .map(CryptoModel::price)
-                                        )
-                                        .flatMap(Optional::stream)
-                                        .toList();
+                .cache();
 
-                                double gain = notification.shouldNotify(last12prices);
-                                if (gain != 0) {
-                                    PushNotificationService.sendPushNotification(
-                                            notification.getNotificationTitle(),
-                                            notification.getNotificationMessage(List.of(gain)),
-                                            notification.getUserId()
-                                    );
-                                    return notificationService.delete(notification)
-                                            .doOnSuccess(s -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
-                                }
-                                return Flux.empty();
-                            });
-                })
-                .subscribe();
+        cryptoHistories.thenMany(
+                Flux.concat(
+                        keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
+                        keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
+                )
+                .map(cryptoDTOMapper::toNonTargetNotification)
+                .flatMap(notification -> cryptoHistories
+                        .flatMap(cryptoHistory -> Flux.fromIterable(cryptoHistory.priceList())
+                                .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
+                                .next() // return first matching Crypto
+                                .map(CryptoModel::price)
+                        )
+                        .collectList()
+                        .map(notification::shouldNotify)
+                        .flatMap(gain -> {
+                            if (gain != 0) {
+                                PushNotificationService.sendPushNotification(
+                                    notification.getNotificationTitle(),
+                                    notification.getNotificationMessage(List.of(gain)),
+                                    notification.getUserId()
+                                );
+
+                                return notificationService.delete(notification)
+                                    .doOnSuccess(_ -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
+                            }
+                            return Mono.empty();
+                        })
+                )
+        ).subscribe();
     }
 }
