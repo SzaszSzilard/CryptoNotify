@@ -17,18 +17,15 @@ import reactor.core.publisher.Mono;
 public class CryptoController {
     private final KeyDbService keyDbService;
     private final Logger log = LoggerFactory.getLogger(CryptoController.class);
-    private final CryptoDTOMapper cryptoDTOMapper;
 
-    public CryptoController(KeyDbService keyDbService,
-                            CryptoDTOMapper cryptoDTOMapper) {
+    public CryptoController(KeyDbService keyDbService) {
         this.keyDbService = keyDbService;
-        this.cryptoDTOMapper = cryptoDTOMapper;
     }
 
     @GetMapping("/symbol/{querySymbol}")
     public Mono<CryptoModel> getCryptoBySymbol(@PathVariable String querySymbol) {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCrypto)
+                .flatMapMany(CryptoDTOMapper::toCrypto)
                 .filter(cryptoPrice -> cryptoPrice.symbol().equalsIgnoreCase(querySymbol))
                 .next();
     }
@@ -36,12 +33,12 @@ public class CryptoController {
     @GetMapping("/list")
     public Flux<CryptoModel> list() {
         return keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCrypto);
+                .flatMapMany(CryptoDTOMapper::toCrypto);
     }
 
     @GetMapping("/history")
     public Flux<CryptoHistoryModel> history(@RequestParam String date) {
         return keyDbService.getFullList("chp-" + date)
-                .map(cryptoDTOMapper::toCryptoHistory);
+                .map(CryptoDTOMapper::toCryptoHistory);
     }
 }

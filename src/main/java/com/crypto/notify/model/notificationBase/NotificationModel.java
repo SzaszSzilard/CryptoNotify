@@ -2,6 +2,7 @@ package com.crypto.notify.model.notificationBase;
 
 import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.model.notificationType.*;
+import com.crypto.notify.util.CryptoDTOMapper;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -61,4 +62,9 @@ public abstract class NotificationModel {
 
     @JsonIgnore
     public abstract String getNotificationMessage(Object... params);
+
+    @Override
+    public String toString() {
+        return CryptoDTOMapper.toJson(this);
+    }
 }

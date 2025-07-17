@@ -1,6 +1,5 @@
 package com.crypto.notify.controller;
 
-import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.model.notificationBase.NotificationModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.util.CryptoDTOMapper;
@@ -15,12 +14,9 @@ import reactor.core.publisher.Flux;
 public class UserController {
     private final Logger log = LoggerFactory.getLogger(UserController.class);
     private final KeyDbService keyDbService;
-    private final CryptoDTOMapper cryptoDTOMapper;
 
-    public UserController(KeyDbService keyDbService,
-                          CryptoDTOMapper cryptoDTOMapper) {
+    public UserController(KeyDbService keyDbService) {
         this.keyDbService = keyDbService;
-        this.cryptoDTOMapper = cryptoDTOMapper;
     }
 
     @GetMapping("/{id}/notifications")
@@ -28,6 +24,6 @@ public class UserController {
         return keyDbService.getKeys("*:" + id)
                 .filter(key -> !key.startsWith("idc:"))
                 .flatMap(key -> keyDbService.getFullList(key))
-                .map(cryptoDTOMapper::toNotification);
+                .map(CryptoDTOMapper::toNotification);
     }
 }

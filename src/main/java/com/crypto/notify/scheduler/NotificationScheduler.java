@@ -23,23 +23,20 @@ import java.util.List;
 public class NotificationScheduler {
 
     private final KeyDbService keyDbService;
-    private final CryptoDTOMapper cryptoDTOMapper;
     private final Logger log = LoggerFactory.getLogger(NotificationScheduler.class);
     private final NotificationService notificationService;
 
 
     public NotificationScheduler(KeyDbService keyDbService,
-                                 CryptoDTOMapper cryptoDTOMapper,
                                  NotificationService notificationService) {
         this.keyDbService = keyDbService;
-        this.cryptoDTOMapper = cryptoDTOMapper;
         this.notificationService = notificationService;
     }
 
     @Scheduled(fixedRate = 1000*60)
     public void PriceTargetNotificationSender() {
         Flux<CryptoModel> cryptoPrices = keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(cryptoDTOMapper::toCrypto)
+                .flatMapMany(CryptoDTOMapper::toCrypto)
                 .cache();
 
         cryptoPrices.thenMany(
@@ -48,7 +45,7 @@ public class NotificationScheduler {
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":*"),
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":*"),
                 keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*")
-            ).map(cryptoDTOMapper::toPriceTarget).cache()
+            ).map(CryptoDTOMapper::toPriceTarget).cache()
                 .flatMap(notification -> notificationService.priceTargetReached(notification, cryptoPrices)
                         .filter(result -> result != 0)
                         .flatMap(_ -> {
@@ -70,7 +67,7 @@ public class NotificationScheduler {
         String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         Flux<CryptoHistoryModel> cryptoHistories = keyDbService.getList(key, -12, -1)
-                .map(cryptoDTOMapper::toCryptoHistory)
+                .map(CryptoDTOMapper::toCryptoHistory)
                 .cache();
 
         cryptoHistories.thenMany(
@@ -78,7 +75,7 @@ public class NotificationScheduler {
                         keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
                         keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
                 )
-                .map(cryptoDTOMapper::toNonTargetNotification)
+                .map(CryptoDTOMapper::toNonTargetNotification)
                 .flatMap(notification -> cryptoHistories
                         .flatMap(cryptoHistory -> Flux.fromIterable(cryptoHistory.priceList())
                                 .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
