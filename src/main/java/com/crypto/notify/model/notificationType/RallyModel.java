@@ -16,7 +16,7 @@ public class RallyModel extends NonTargetNotificationModel {
 
     @Override
     public double shouldNotify(List<Double> prices) {
-        double threshold = 2.0;
+        double threshold = 1.0;
         double gain = (prices.getLast() - prices.getFirst()) / prices.getFirst() * 100;
 
         long risingSteps = IntStream.range(1, prices.size())
