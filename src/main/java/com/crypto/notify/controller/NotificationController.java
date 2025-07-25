@@ -22,25 +22,4 @@ public class NotificationController {
     public Mono<Long> delete(@RequestBody NotificationModel notification) {
         return notificationService.delete(notification);
     }
-
-//    // Debugging endpoints
-//    @PostMapping("/nabovet")
-//    public Mono<Boolean> a(@RequestBody PriceAboveModel notification) {
-//        return notificationService.priceTargetReached(notification);
-//    }
-//
-//    @PostMapping("/nbelowt")
-//    public Mono<Boolean> b(@RequestBody PriceBelowModel notification) {
-//        return notificationService.priceTargetReached(notification);
-//    }
-//
-//    @PostMapping("/npabovet")
-//    public Mono<Boolean> pa(@RequestBody PercentageAboveModel notification) {
-//        return notificationService.priceTargetReached(notification);
-//    }
-//
-//    @PostMapping("/npbelowt")
-//    public Mono<Boolean> pb(@RequestBody PercentageBelowModel notification) {
-//        return notificationService.priceTargetReached(notification);
-//    }
 }
