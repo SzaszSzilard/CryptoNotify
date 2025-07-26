@@ -16,6 +16,10 @@ public class RallyModel extends NonTargetNotificationModel {
 
     @Override
     public double shouldNotify(List<Double> prices) {
+        if (prices == null || prices.size() < 12) {
+            return 0;
+        }
+
         double threshold = 1.0;
         double gain = (prices.getLast() - prices.getFirst()) / prices.getFirst() * 100;
 

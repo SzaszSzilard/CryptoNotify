@@ -6,10 +6,13 @@ import com.crypto.notify.constants.Constants;
 import com.crypto.notify.util.CryptoDTOMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import reactor.netty.http.client.HttpClient;
+import reactor.netty.resources.ConnectionProvider;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -25,8 +28,19 @@ public class BinancePollingScheduler {
 
     public BinancePollingScheduler(WebClient.Builder webClientBuilder,
                                    KeyDbService keyDbService) {
-        this.webClient = webClientBuilder.baseUrl("https://api.binance.com").build();
         this.keyDbService = keyDbService;
+        ConnectionProvider provider = ConnectionProvider.builder("custom")
+                .maxConnections(100)
+                .pendingAcquireMaxCount(2000)
+                .pendingAcquireTimeout(Duration.ofSeconds(1))
+                .build();
+
+        HttpClient httpClient = HttpClient.create(provider);
+
+        this.webClient = webClientBuilder
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
+                .baseUrl("https://api.binance.com")
+                .build();
     }
 
     @Scheduled(fixedRate = 1000)

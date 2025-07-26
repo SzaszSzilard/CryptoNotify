@@ -37,6 +37,10 @@ public class DirectionChangeModel extends NonTargetNotificationModel {
 
     @Override
     public double shouldNotify(List<Double> prices) {
+        if (prices == null || prices.size() < 12) {
+            return 0;
+        }
+
         int prevTrend = getTrend( prices.subList( 0, prices.size()/2 ));
         int currTrend = getTrend( prices.subList( prices.size()/2, prices.size() ));
 
