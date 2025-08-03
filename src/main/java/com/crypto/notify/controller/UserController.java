@@ -23,7 +23,7 @@ public class UserController {
     public Flux<NotificationModel> userNotifications(@PathVariable String id) {
         return keyDbService.getKeys("*:" + id)
                 .filter(key -> !key.startsWith("idc:"))
-                .flatMap(key -> keyDbService.getFullList(key))
+                .flatMap(keyDbService::getFullList)
                 .map(CryptoDTOMapper::toNotification);
     }
 }
