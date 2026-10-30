@@ -58,8 +58,9 @@ public class DirectionChangeModel extends NonTargetNotificationModel {
 
     @Override
     public String getNotificationMessage(Object... params) {
+        boolean isRising = params.length > 0 && params[0] instanceof Number n && n.doubleValue() > 0;
         return String.format("In last hour the trend changed from %s to %s.",
-                params[0].equals(1) ? "rising" : "falling",
-                params[0].equals(1) ? "falling" : "rising");
+                isRising ? "falling" : "rising",
+                isRising ? "rising" : "falling");
     }
 }
