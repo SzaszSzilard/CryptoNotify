@@ -6,8 +6,6 @@ import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -21,24 +19,24 @@ public class NotificationService {
         this.keyDbService = keyDbService;
     }
 
-    public Mono<Double> priceTargetReached(PriceTargetNotificationModel notification, Flux<CryptoModel> cryptoPrices) {
-        return cryptoPrices
+    public double priceTargetReached(PriceTargetNotificationModel notification, List<CryptoModel> cryptoPrices) {
+        return cryptoPrices.stream()
                 .filter(cryptoPrice -> cryptoPrice.symbol().equals(notification.getSymbol()))
-                .next() // return first matching Crypto
+                .findFirst()
                 .map(CryptoModel::price)
                 .map(List::of)
-                .map(notification::shouldNotify);
+                .map(notification::shouldNotify)
+                .orElse(0.0);
     }
 
-    public Mono<Long> save(NotificationModel notification) {
+    public Long save(NotificationModel notification) {
         String key = notification.getType() + ":" + notification.getUserId();
-        return keyDbService.getIncId(ID_COUNTER + key).flatMap(id -> {
-            notification.setId(id);
-            return keyDbService.pushIntoList(key, notification.toString());
-        });
+        Long id = keyDbService.getIncId(ID_COUNTER + key);
+        notification.setId(id);
+        return keyDbService.pushIntoList(key, notification.toString());
     }
 
-    public Mono<Long> delete(NotificationModel notification) {
+    public Long delete(NotificationModel notification) {
         String key = notification.getType() + ":" + notification.getUserId();
         return keyDbService.removeFromList(key, notification.toString());
     }

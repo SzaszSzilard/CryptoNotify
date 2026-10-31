@@ -1,7 +1,5 @@
 package com.crypto.notify.model.notificationBase;
 
-import java.util.List;
-
 public abstract class NonTargetNotificationModel extends NotificationModel {
     private final String time;
 

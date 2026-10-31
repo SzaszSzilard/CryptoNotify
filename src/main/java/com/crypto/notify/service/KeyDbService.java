@@ -1,55 +1,75 @@
 package com.crypto.notify.service;
 
-import org.springframework.data.redis.core.ReactiveRedisTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class KeyDbService {
-    private final ReactiveRedisTemplate<String, String> reactiveRedisTemplate;
+    private static final Logger log = LoggerFactory.getLogger(KeyDbService.class);
+    private final StringRedisTemplate stringRedisTemplate;
 
-    public KeyDbService(ReactiveRedisTemplate<String, String> reactiveRedisTemplate) {
-        this.reactiveRedisTemplate = reactiveRedisTemplate;
+    public KeyDbService(StringRedisTemplate stringRedisTemplate) {
+        this.stringRedisTemplate = stringRedisTemplate;
     }
 
-    public Mono<Long> getIncId(String key) {
-        return reactiveRedisTemplate.opsForValue().increment(key);
+    public Long getIncId(String key) {
+        return stringRedisTemplate.opsForValue().increment(key);
     }
 
-    public Mono<String> getValue(String key) {
-        return reactiveRedisTemplate.opsForValue().get(key);
+    public String getValue(String key) {
+        return stringRedisTemplate.opsForValue().get(key);
     }
 
-    public Mono<Boolean> saveValue(String key, String value) {
-        return reactiveRedisTemplate.opsForValue().set(key, value);
+    public Boolean saveValue(String key, String value) {
+        try {
+            stringRedisTemplate.opsForValue().set(key, value);
+            return true;
+        } catch (Exception e) {
+            log.warn("KeyDB saveValue failed for key '{}': {}", key, e.getMessage());
+            return false;
+        }
     }
 
-    public Mono<Boolean> deleteKey(String key) {
-        return reactiveRedisTemplate.opsForValue().delete(key);
+    public Boolean deleteKey(String key) {
+        return stringRedisTemplate.delete(key);
     }
 
-    public Mono<Long> removeFromList(String key, String value) {
-        return reactiveRedisTemplate.opsForList().remove(key, 1, value);
+    public Long removeFromList(String key, String value) {
+        return stringRedisTemplate.opsForList().remove(key, 1, value);
     }
 
-    public Mono<Long> pushIntoList(String key, String value) {
-        return reactiveRedisTemplate.opsForList().leftPush(key, value);
+    public Long pushIntoList(String key, String value) {
+        return stringRedisTemplate.opsForList().leftPush(key, value);
     }
 
-    public Flux<String> getList(String key, int start, int end) {
-        return reactiveRedisTemplate.opsForList().range(key, start, end);
+    public List<String> getList(String key, int start, int end) {
+        List<String> list = stringRedisTemplate.opsForList().range(key, start, end);
+        return list != null ? list : Collections.emptyList();
     }
 
-    public Flux<String> getFullList(String key) {
-        return reactiveRedisTemplate.opsForList().range(key, 0, -1);
+    public List<String> getFullList(String key) {
+        List<String> list = stringRedisTemplate.opsForList().range(key, 0, -1);
+        return list != null ? list : Collections.emptyList();
     }
 
-    public Flux<String> getKeys(String pattern) {
-        return reactiveRedisTemplate.keys(pattern);
+    public Set<String> getKeys(String pattern) {
+        Set<String> keys = stringRedisTemplate.keys(pattern);
+        return keys != null ? keys : Collections.emptySet();
     }
 
-    public Flux<String> getAllCombinedKeys(String composedKey) {
-        return reactiveRedisTemplate.keys(composedKey).flatMap(this::getFullList);
+    public List<String> getAllCombinedKeys(String composedKey) {
+        Set<String> keys = getKeys(composedKey);
+        List<String> combined = new ArrayList<>();
+        for (String key : keys) {
+            combined.addAll(getFullList(key));
+        }
+        return combined;
     }
 }

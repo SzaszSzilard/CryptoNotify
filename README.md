@@ -1,5 +1,5 @@
 # CryptoNotify
-Java WebFlux (Reactor) project that consumes real-time Binance data and serves notifications to clients.  
+Java Spring Boot project powered by Virtual Threads that consumes real-time Binance data and serves notifications to clients.  
 Push notifications are delivered via Firebase. Every user should have a Firebase token to receive notifications.  
 CryptoNotifyUI serves as a React Native–based mobile application that connects to this backend:  
 https://github.com/SzaszSzilard/CryptoNotifyUI

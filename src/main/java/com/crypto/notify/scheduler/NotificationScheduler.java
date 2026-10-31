@@ -4,6 +4,8 @@ import com.crypto.notify.constants.Constants;
 import com.crypto.notify.constants.NotificationTypeConstants;
 import com.crypto.notify.dto.CryptoHistoryModel;
 import com.crypto.notify.dto.CryptoModel;
+import com.crypto.notify.model.notificationBase.NonTargetNotificationModel;
+import com.crypto.notify.model.notificationBase.PriceTargetNotificationModel;
 import com.crypto.notify.service.KeyDbService;
 import com.crypto.notify.service.NotificationService;
 import com.crypto.notify.service.PushNotificationService;
@@ -12,12 +14,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 
 @Service
 public class NotificationScheduler {
@@ -26,78 +29,102 @@ public class NotificationScheduler {
     private final Logger log = LoggerFactory.getLogger(NotificationScheduler.class);
     private final NotificationService notificationService;
 
-
     public NotificationScheduler(KeyDbService keyDbService,
                                  NotificationService notificationService) {
         this.keyDbService = keyDbService;
         this.notificationService = notificationService;
     }
 
-    @Scheduled(fixedRate = 1000*60)
+    @Scheduled(fixedRate = 1000 * 60)
     public void PriceTargetNotificationSender() {
-        Flux<CryptoModel> cryptoPrices = keyDbService.getValue(Constants.CRYPTO_PRICES)
-                .flatMapMany(CryptoDTOMapper::toCrypto)
-                .cache();
+        try {
+            String rawPrices = keyDbService.getValue(Constants.CRYPTO_PRICES);
+            List<CryptoModel> cryptoPrices = CryptoDTOMapper.toCrypto(rawPrices);
+            if (cryptoPrices.isEmpty()) {
+                return;
+            }
 
-        cryptoPrices.thenMany(
-            Flux.concat(
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_ABOVE + ":*"),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":*"),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":*"),
-                keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*")
-            ).map(CryptoDTOMapper::toPriceTarget).cache()
-                .flatMap(notification -> notificationService.priceTargetReached(notification, cryptoPrices)
-                        .filter(result -> result != 0)
-                        .flatMap(_ -> {
+            List<PriceTargetNotificationModel> notifications = Stream.of(
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_ABOVE + ":*"),
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_BELOW + ":*"),
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_ABOVE + ":*"),
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_PERCENT_BELOW + ":*")
+                    )
+                    .flatMap(List::stream)
+                    .map(CryptoDTOMapper::toPriceTarget)
+                    .toList();
+
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                for (PriceTargetNotificationModel notification : notifications) {
+                    executor.submit(() -> {
+                        double result = notificationService.priceTargetReached(notification, cryptoPrices);
+                        if (result != 0) {
                             PushNotificationService.sendPushNotification(
                                     notification.getNotificationTitle(),
                                     notification.getNotificationMessage(),
                                     notification.getUserId()
                             );
-                            return notificationService.delete(notification)
-                                    .doOnSuccess(_ -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
-                        })
-                )
-        ).subscribe();
+                            notificationService.delete(notification);
+                            log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId());
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Price target notification check skipped/failed: {}", e.getMessage());
+        }
     }
 
-    @Scheduled(fixedRate = 1000*60)
+    @Scheduled(fixedRate = 1000 * 60)
     public void NonPriceTargetNotificationSender() {
-        LocalDateTime now = LocalDateTime.now();
-        String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            String key = "chp" + "-" + now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        Flux<CryptoHistoryModel> cryptoHistories = keyDbService.getList(key, -12, -1)
-                .map(CryptoDTOMapper::toCryptoHistory)
-                .cache();
+            List<CryptoHistoryModel> cryptoHistories = keyDbService.getList(key, -12, -1)
+                    .stream()
+                    .map(CryptoDTOMapper::toCryptoHistory)
+                    .toList();
 
-        cryptoHistories.thenMany(
-                Flux.concat(
-                        keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
-                        keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
-                )
-                .map(CryptoDTOMapper::toNonTargetNotification)
-                .flatMap(notification -> cryptoHistories
-                        .flatMap(cryptoHistory -> Flux.fromIterable(cryptoHistory.priceList())
-                                .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
-                                .next() // return first matching Crypto
-                                .map(CryptoModel::price)
-                        )
-                        .collectList()
-                        .map(notification::shouldNotify)
-                        .flatMap(gain -> {
-                            if (gain != 0) {
-                                PushNotificationService.sendPushNotification(
+            if (cryptoHistories.isEmpty()) {
+                return;
+            }
+
+            List<NonTargetNotificationModel> notifications = Stream.of(
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_RALLY + ":*"),
+                            keyDbService.getAllCombinedKeys(NotificationTypeConstants.N_CHANGE + ":*")
+                    )
+                    .flatMap(List::stream)
+                    .map(CryptoDTOMapper::toNonTargetNotification)
+                    .toList();
+
+            try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+                for (NonTargetNotificationModel notification : notifications) {
+                    executor.submit(() -> {
+                        List<Double> prices = cryptoHistories.stream()
+                                .map(cryptoHistory -> cryptoHistory.priceList().stream()
+                                        .filter(crypto -> crypto.symbol().equals(notification.getSymbol()))
+                                        .findFirst()
+                                        .map(CryptoModel::price)
+                                        .orElse(null))
+                                .filter(Objects::nonNull)
+                                .toList();
+
+                        double gain = notification.shouldNotify(prices);
+                        if (gain != 0) {
+                            PushNotificationService.sendPushNotification(
                                     notification.getNotificationTitle(),
-                                    notification.getNotificationMessage(List.of(gain)),
+                                    notification.getNotificationMessage(gain),
                                     notification.getUserId()
-                                );
-
-                                return notificationService.delete(notification)
-                                    .doOnSuccess(_ -> log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId()));
-                            }
-                            return Mono.empty();
-                        })
-                )
-        ).subscribe();
+                            );
+                            notificationService.delete(notification);
+                            log.info("Notification deleted, type: {}, id: {}", notification.getType(), notification.getId());
+                        }
+                    });
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Non-price target notification check skipped/failed: {}", e.getMessage());
+        }
     }
 }

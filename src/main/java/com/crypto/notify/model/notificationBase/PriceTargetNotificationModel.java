@@ -1,9 +1,5 @@
 package com.crypto.notify.model.notificationBase;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.List;
-
 public abstract class PriceTargetNotificationModel extends NotificationModel {
     protected Double price;
 
